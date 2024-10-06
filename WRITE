@@ -1,17 +1,19 @@
-<div class="app-container">
-    <header>
-        <h1>Employee Management System</h1>
-        <nav>
-            <a routerLink="/employees" routerLinkActive="active">Employees</a>
-            <a routerLink="/departments" routerLinkActive="active">Departments</a>
-        </nav>
-    </header>
+▲ [WARNING] Polyfill for "@angular/localize/init" was added automatically. [plugin angular-polyfills-server]     
 
-    <main>
-        <router-outlet></router-outlet> <!-- This is where your routed components will be displayed -->
-    </main>
+  In the future, this functionality will be removed. Please add this polyfill in the "polyfills" section of your 
+"angular.json" instead.
 
-    <footer>
-        <p>&copy; 2024 Employee Management System. All rights reserved.</p>
-    </footer>
-</div>
+
+X [ERROR] Angular compilation initialization failed. [plugin angular-compiler]
+
+  Error: Debug Failure. Expected C:/Users/patnsana/emp-management/.angular/cache/18.2.7/emp-management/.tsbuildinfo === C:\Users\patnsana\emp-management\.angular\cache\18.2.7\emp-management\.tsbuildinfo.
+      at attachFileToDiagnostic (C:\Users\patnsana\emp-management\node_modules\typescript\lib\typescript.js:21420:9)
+      at attachFileToDiagnostics (C:\Users\patnsana\emp-management\node_modules\typescript\lib\typescript.js:21449:34)
+      at Object.parseJsonText2 [as parseJsonText] (C:\Users\patnsana\emp-management\node_modules\typescript\lib\typescript.js:32612:35)
+      at parseJsonText (C:\Users\patnsana\emp-management\node_modules\typescript\lib\typescript.js:32370:17)     
+      at parseConfigFileTextToJson (C:\Users\patnsana\emp-management\node_modules\typescript\lib\typescript.js:41612:26)
+      at readJsonOrUndefined (C:\Users\patnsana\emp-management\node_modules\typescript\lib\typescript.js:20886:18)
+      at getBuildInfo (C:\Users\patnsana\emp-management\node_modules\typescript\lib\typescript.js:118355:10)     
+      at Object.readBuilderProgram (C:\Users\patnsana\emp-management\node_modules\typescript\lib\typescript.js:130807:17)
+      at AotCompilation.initialize (C:\Users\patnsana\emp-management\node_modules\@angular\build\src\tools\angular\compilation\aot-compilation.js:60:47)
+      at async initialize (C:\Users\patnsana\emp-management\node_modules\@angular\build\src\tools\angular\compilation\parallel-worker.js:36:50)
