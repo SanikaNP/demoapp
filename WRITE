@@ -22,7 +22,7 @@ export class EmployeeComponent implements OnInit {
     pinCode: '',
     gender: '',
   };
-  selectedEmployee: Employee | null = null
+  selectedEmployee: Employee | null = null;
     
   states: string[] = ['State1', 'State2', 'State3'];
 
@@ -33,13 +33,10 @@ export class EmployeeComponent implements OnInit {
   }
 
   exportEmployees(): void {
-    // Create a new workbook and a new worksheet
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.employees);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
-
-    // Append the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Employees');
-
+    
     // Generate Excel file and save
     const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data: Blob = new Blob([excelBuffer], { type: EXCEL_TYPE });
@@ -47,7 +44,7 @@ export class EmployeeComponent implements OnInit {
   }
 
   loadEmployees(): void {
-    this.employeeService.getEmployees().subscribe((data) => {
+    this.employeeService.getEmployees().subscribe((data: Employee[]) => {
       this.employees = data;
     });
   }
@@ -76,20 +73,11 @@ export class EmployeeComponent implements OnInit {
       // Update existing employee
       this.employeeService.updateEmployee(this.selectedEmployee.id!, formValue).subscribe(() => {
         this.loadEmployees();
-        this.selectedEmployee = {
-          id: 0,
-          name: '',
-          dateOfBirth: '',
-          qualification: '',
-          city: '',
-          state: '',
-          pinCode: '',
-          gender: '',
-        }; 
+        this.selectedEmployee = null; // Clear selectedEmployee after update
       });
     } else {
       // Add new employee
-      this.employeeService.addEmployee(formValue).subscribe((employee) => {
+      this.employeeService.addEmployee(formValue).subscribe((employee: Employee) => {
         this.employees.push(employee);
         this.newEmployee = {
           id: 0,
@@ -113,6 +101,7 @@ export class EmployeeComponent implements OnInit {
     }
   }
 }
+
 const EXCEL_TYPE =
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
 const EXCEL_EXTENSION = '.xlsx';
