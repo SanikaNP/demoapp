@@ -343,4 +343,75 @@ export interface Employee {
         gender: string;
         departmentId?: number; // Link to department
       }
+
+
+
+====================================================================================================
+
+
+header.component.ts
+typescript
+Copy code
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.css']
+})
+export class HeaderComponent {
+  title = 'Employee Management System';
+}
+2. header.component.html
+html
+Copy code
+<header>
+  <nav>
+    <h1>{{ title }}</h1>
+    <ul>
+      <li><a routerLink="/employees" routerLinkActive="active">Employees</a></li>
+      <li><a routerLink="/departments" routerLinkActive="active">Departments</a></li>
+    </ul>
+  </nav>
+</header>
+3. header.component.css
+css
+Copy code
+header {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav h1 {
+  margin: 0;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+nav ul li {
+  margin-left: 20px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav ul li a.active {
+  border-bottom: 2px solid yellow;
+}
       
