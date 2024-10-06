@@ -1,0 +1,45 @@
+<div>
+        <h2>Employee Management</h2>
+        
+        <form (ngSubmit)="addEmployee()">
+          <input type="text" [(ngModel)]="newEmployee.name" name="name" placeholder="Employee Name" required />
+          <input type="date" [(ngModel)]="newEmployee.dateOfBirth" name="dob" required />
+          <input type="text" [(ngModel)]="newEmployee.qualification" name="qualification" placeholder="Qualification" />
+          <input type="text" [(ngModel)]="newEmployee.city" name="city" placeholder="City" />
+          <input type="text" [(ngModel)]="newEmployee.state" name="state" placeholder="State" />
+          <input type="text" [(ngModel)]="newEmployee.pinCode" name="pinCode" placeholder="Pin Code" />
+          <select [(ngModel)]="newEmployee.gender" name="gender" required>
+            <option value="" disabled>Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          <button type="submit">Add Employee</button>
+        </form>
+        
+        <table>
+          <tr>
+            <th>Employee Name</th>
+            <th>Date of Birth</th>
+            <th>Qualification</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Pin Code</th>
+            <th>Gender</th>
+            <th>Actions</th>
+          </tr>
+          <tr *ngFor="let employee of employees">
+            <td>{{ employee.name }}</td>
+            <td>{{ employee.dateOfBirth }}</td>
+            <td>{{ employee.qualification }}</td>
+            <td>{{ employee.city }}</td>
+            <td>{{ employee.state }}</td>
+            <td>{{ employee.pinCode }}</td>
+            <td>{{ employee.gender }}</td>
+            <td>
+              <button (click)="employee.id !== undefined && deleteEmployee(employee.id)">Delete</button>
+            </td>
+          </tr>
+        </table>
+      </div>
+      

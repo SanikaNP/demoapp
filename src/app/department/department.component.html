@@ -1,0 +1,24 @@
+<div>
+        <h2>Department Management</h2>
+        <form (ngSubmit)="addDepartment()">
+          <input type="text" [(ngModel)]="newDepartment.name" name="name" placeholder="Department Name" required />
+          <textarea [(ngModel)]="newDepartment.shortDescription" name="description" placeholder="Short Description"></textarea>
+          <button type="submit">Add Department</button>
+        </form>
+        
+        <table>
+          <tr>
+            <th>Department Name</th>
+            <th>Short Description</th>
+            <th>Actions</th>
+          </tr>
+          <tr *ngFor="let department of departments">
+            <td>{{ department.name }}</td>
+            <td>{{ department.shortDescription }}</td>
+            <td>
+              <button (click)="deleteDepartment(department.id!)">Delete</button> <!-- Add non-null assertion operator -->
+            </td>
+          </tr>
+        </table>
+      </div>
+      
