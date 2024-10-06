@@ -1,65 +1,66 @@
-<div>
-  <h2>Department Management</h2>
-  <button (click)="openAddDepartmentModal(addDepartmentModal)">Add Department</button>
-  
-  <table>
-    <tr>
-      <th>Department Name</th>
-      <th>Short Description</th>
-      <th>Number of Employees</th>
-      <th>Actions</th>
-    </tr>
-    <tr *ngFor="let department of departments">
-      <td (click)="openEditDepartmentModal(editDepartmentModal, department)">{{ department.name }}</td>
-      <td>{{ department.shortDescription }}</td>
-      <td>{{ department.numberOfEmployees }}</td>
-      <td>
-        <button (click)="deleteDepartment(department.id!)">Delete</button>
-      </td>
-    </tr>
-  </table>
+import { Component, OnInit, TemplateRef } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Department } from './department'; // Adjust path if department.ts is in the same folder
+import { DepartmentService } from './department.service'; // Adjust path if department.service.ts is in the same folder
 
-  <!-- Add Department Modal -->
-  <ng-template #addDepartmentModal let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Add Department</h4>
-      <button type="button" class="close" (click)="modal.dismiss('Cross click')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <form #departmentForm="ngForm" (ngSubmit)="saveDepartment(departmentForm.value)">
-        <div>
-          <label>Department Name:</label>
-          <input type="text" name="name" [(ngModel)]="newDepartment.name" placeholder="Department Name" required maxlength="200" />
-        </div>
-        <div>
-          <label>Short Description:</label>
-          <textarea name="description" [(ngModel)]="newDepartment.shortDescription" placeholder="Short Description"></textarea>
-        </div>
-        <button type="submit">Save</button>
-        <button type="button" (click)="modal.dismiss('Close click')">Cancel</button>
-      </form>
-    </div>
-  </ng-template>
+@Component({
+  selector: 'app-department',
+  templateUrl: './department.component.html',
+  styleUrls: ['./department.component.css'],
+})
+export class DepartmentComponent implements OnInit {
+  departments: Department[] = [];
+  newDepartment: Department = {
+    name: '',
+    shortDescription: '',
+    id: 0,
+  };
+  selectedDepartment: Department | null = null;
 
-  <!-- Edit Department Modal -->
-  <ng-template #editDepartmentModal let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Edit Department</h4>
-      <button type="button" class="close" (click)="modal.dismiss('Cross click')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <form #departmentForm="ngForm" (ngSubmit)="saveDepartment(departmentForm.value)">
-        <div>
-          <label>Department Name:</label>
-          <input type="text" name="name" [(ngModel)]="selectedDepartment.name" placeholder="Department Name" required maxlength="200" />
-        </div>
-        <div>
-          <label>Short Description:</label>
-          <textarea name="description" [(ngModel)]="selectedDepartment.shortDescription" placeholder="Short Description"></textarea>
-        </div>
-        <button type="submit">Save</button>
-        <button type="button" (click)="modal.dismiss('Close click')">Cancel</button>
-      </form>
-    </div>
-  </ng-template>
-</div>
+  constructor(private departmentService: DepartmentService, private modalService: NgbModal) {}
+
+  ngOnInit(): void {
+    this.loadDepartments();
+  }
+
+  loadDepartments(): void {
+    this.departmentService.getDepartments().subscribe((data) => {
+      this.departments = data;
+    });
+  }
+
+  openAddDepartmentModal(content: TemplateRef<any>): void {
+    this.newDepartment = { name: '', shortDescription: '', id: 0 }; // Reset the form
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+  }
+
+  openEditDepartmentModal(content: TemplateRef<any>, department: Department): void {
+    this.selectedDepartment = { ...department }; // Clone the department object to avoid mutation
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+  }
+
+  saveDepartment(formValue: any): void {
+    if (this.selectedDepartment) {
+      // Update existing department
+      this.departmentService.updateDepartment(this.selectedDepartment.id, formValue).subscribe(() => {
+        this.loadDepartments();
+        this.selectedDepartment = null; // Clear the selected department after saving
+      });
+    } else {
+      // Add new department
+      this.departmentService.addDepartment(formValue).subscribe((department) => {
+        this.departments.push(department);
+        this.newDepartment = { name: '', shortDescription: '', id: 0 }; // Reset the form
+      });
+    }
+  }
+
+  deleteDepartment(id: number): void {
+    // Confirm deletion with a warning
+    if (confirm('Are you sure you want to delete this department?')) {
+      this.departmentService.deleteDepartment(id).subscribe(() => {
+        this.departments = this.departments.filter((d) => d.id !== id);
+      });
+    }
+  }
+}
