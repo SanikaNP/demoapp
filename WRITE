@@ -1,93 +1,190 @@
+import { Component, OnInit, TemplateRef } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Employee } from './employee'; // Ensure this path is correct
+import { EmployeeService } from './employee.service'; // Ensure this path is correct
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+
+@Component({
+  selector: 'app-employee',
+  templateUrl: './employee.component.html',
+  styleUrls: ['./employee.component.css'],
+})
+export class EmployeeComponent implements OnInit {
+  employees: Employee[] = [];
+  newEmployee: Employee = {
+    id: 0,
+    name: '',
+    dateOfBirth: '',
+    qualification: '',
+    city: '',
+    state: '',
+    pinCode: '',
+    gender: '',
+  };
+  selectedEmployee: Employee | null = null; // Initialize as null
+
+  states: string[] = ['State1', 'State2', 'State3'];
+
+  constructor(private employeeService: EmployeeService, private modalService: NgbModal) {}
+
+  ngOnInit(): void {
+    this.loadEmployees();
+  }
+
+  loadEmployees(): void {
+    this.employeeService.getEmployees().subscribe((data: Employee[]) => {
+      this.employees = data;
+    });
+  }
+
+  openAddEmployeeModal(content: TemplateRef<any>): void {
+    this.newEmployee = { id: 0, name: '', dateOfBirth: '', qualification: '', city: '', state: '', pinCode: '', gender: '' };
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+  }
+
+  openEditEmployeeModal(content: TemplateRef<any>, employee: Employee): void {
+    this.selectedEmployee = { ...employee }; // Clone the employee object
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+  }
+
+  saveEmployee(formValue: any): void {
+    if (this.selectedEmployee) {
+      // Update existing employee
+      this.employeeService.updateEmployee(this.selectedEmployee.id!, formValue).subscribe(() => {
+        this.loadEmployees();
+        this.selectedEmployee = null; // Clear selectedEmployee after update
+      });
+    } else {
+      // Add new employee
+      this.employeeService.addEmployee(formValue).subscribe((employee: Employee) => {
+        this.employees.push(employee);
+        this.newEmployee = { id: 0, name: '', dateOfBirth: '', qualification: '', city: '', state: '', pinCode: '', gender: '' }; // Reset the form
+      });
+    }
+  }
+
+  deleteEmployee(id: number): void {
+    if (confirm('Are you sure you want to delete this employee?')) {
+      this.employeeService.deleteEmployee(id).subscribe(() => {
+        this.employees = this.employees.filter((e) => e.id !== id);
+      });
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div>
-    <h2>Employee Management</h2>
-    <button (click)="openAddEmployeeModal(addEmployeeModal)">Add Employee</button>
-    <button (click)="exportEmployees()">Export to Excel</button>
-  
-    <table>
-      <thead>
-        <tr>
-          <th>Employee Name</th>
-          <th>Date of Birth</th>
-          <th>Qualification</th>
-          <th>City</th>
-          <th>State</th>
-          <th>Pin Code</th>
-          <th>Gender</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let employee of employees">
-          <td (click)="openEditEmployeeModal(editEmployeeModal, employee)">{{ employee.name }}</td>
-          <td>{{ employee.dateOfBirth }}</td>
-          <td>{{ employee.qualification }}</td>
-          <td>{{ employee.city }}</td>
-          <td>{{ employee.state }}</td>
-          <td>{{ employee.pinCode }}</td>
-          <td>{{ employee.gender }}</td>
-          <td>
-            <button (click)="deleteEmployee(employee.id)">Delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <h2>Employee Management</h2>
+  <button (click)="openAddEmployeeModal(addEmployeeModal)">Add Employee</button>
+  <button (click)="exportEmployees()">Export to Excel</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Employee Name</th>
+        <th>Date of Birth</th>
+        <th>Qualification</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Pin Code</th>
+        <th>Gender</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let employee of employees">
+        <td (click)="openEditEmployeeModal(editEmployeeModal, employee)">{{ employee.name }}</td>
+        <td>{{ employee.dateOfBirth }}</td>
+        <td>{{ employee.qualification }}</td>
+        <td>{{ employee.city }}</td>
+        <td>{{ employee.state }}</td>
+        <td>{{ employee.pinCode }}</td>
+        <td>{{ employee.gender }}</td>
+        <td>
+          <button (click)="deleteEmployee(employee.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal for Adding/Editing Employee -->
+<ng-template #addEmployeeModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Add Employee</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
   </div>
-  
-  <!-- Modal for Adding/Editing Employee -->
-  <ng-template #addEmployeeModal let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Add Employee</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form #employeeForm="ngForm" (ngSubmit)="saveEmployee(newEmployee)">
-        <input type="text" [(ngModel)]="newEmployee.name" name="name" placeholder="Employee Name" required maxlength="100" />
-        <input type="date" [(ngModel)]="newEmployee.dateOfBirth" name="dob" required />
-        <input type="text" [(ngModel)]="newEmployee.qualification" name="qualification" placeholder="Qualification" />
-        <input type="text" [(ngModel)]="newEmployee.city" name="city" placeholder="City" />
-        <select [(ngModel)]="newEmployee.state" name="state">
-          <option *ngFor="let state of states" [value]="state">{{ state }}</option>
-        </select>
-        <input type="text" [(ngModel)]="newEmployee.pinCode" name="pinCode" placeholder="Pin Code" />
-        <div>
-          <label>Gender:</label>
-          <label><input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Male" required /> Male</label>
-          <label><input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Female" required /> Female</label>
-          <label><input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Other" required /> Other</label>
-        </div>
-        <button type="submit">Save</button>
-        <button type="button" (click)="modal.dismiss('Cancel click')">Cancel</button>
-      </form>
-    </div>
-  </ng-template>
-  
-  <ng-template #editEmployeeModal let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Edit Employee</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form #employeeEditForm="ngForm" (ngSubmit)="saveEmployee(selectedEmployee)">
-        <input type="text" [(ngModel)]="selectedEmployee.name" name="name" placeholder="Employee Name" required maxlength="100" />
-        <input type="date" [(ngModel)]="selectedEmployee.dateOfBirth" name="dob" required />
-        <input type="text" [(ngModel)]="selectedEmployee.qualification" name="qualification" placeholder="Qualification" />
-        <input type="text" [(ngModel)]="selectedEmployee.city" name="city" placeholder="City" />
-        <select [(ngModel)]="selectedEmployee.state" name="state">
-          <option *ngFor="let state of states" [value]="state">{{ state }}</option>
-        </select>
-        <input type="text" [(ngModel)]="selectedEmployee.pinCode" name="pinCode" placeholder="Pin Code" />
-        <div>
-          <label>Gender:</label>
-          <label><input type="radio" [(ngModel)]="selectedEmployee.gender" name="gender" value="Male" required /> Male</label>
-          <label><input type="radio" [(ngModel)]="selectedEmployee.gender" name="gender" value="Female" required /> Female</label>
-          <label><input type="radio" [(ngModel)]="selectedEmployee.gender" name="gender" value="Other" required /> Other</label>
-        </div>
-        <button type="submit">Save</button>
-        <button type="button" (click)="modal.dismiss('Cancel click')">Cancel</button>
-      </form>
-    </div>
-  </ng-template>
+  <div class="modal-body">
+    <form #employeeForm="ngForm" (ngSubmit)="saveEmployee(newEmployee)">
+      <input type="text" [(ngModel)]="newEmployee.name" name="name" placeholder="Employee Name" required maxlength="100" />
+      <input type="date" [(ngModel)]="newEmployee.dateOfBirth" name="dob" required />
+      <input type="text" [(ngModel)]="newEmployee.qualification" name="qualification" placeholder="Qualification" />
+      <input type="text" [(ngModel)]="newEmployee.city" name="city" placeholder="City" />
+      <select [(ngModel)]="newEmployee.state" name="state">
+        <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+      </select>
+      <input type="text" [(ngModel)]="newEmployee.pinCode" name="pinCode" placeholder="Pin Code" />
+      <div>
+        <label>Gender:</label>
+        <label><input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Male" required /> Male</label>
+        <label><input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Female" required /> Female</label>
+        <label><input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Other" required /> Other</label>
+      </div>
+      <button type="submit">Save</button>
+      <button type="button" (click)="modal.dismiss('Cancel click')">Cancel</button>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #editEmployeeModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Edit Employee</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #employeeEditForm="ngForm" (ngSubmit)="saveEmployee(selectedEmployee)">
+      <input type="text" [(ngModel)]="selectedEmployee?.name" name="name" placeholder="Employee Name" required maxlength="100" />
+      <input type="date" [(ngModel)]="selectedEmployee?.dateOfBirth" name="dob" required />
+      <input type="text" [(ngModel)]="selectedEmployee?.qualification" name="qualification" placeholder="Qualification" />
+      <input type="text" [(ngModel)]="selectedEmployee?.city" name="city" placeholder="City" />
+      <select [(ngModel)]="selectedEmployee?.state" name="state">
+        <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+      </select>
+      <input type="text" [(ngModel)]="selectedEmployee?.pinCode" name="pinCode" placeholder="Pin Code" />
+      <div>
+        <label>Gender:</label>
+        <label><input type="radio" [(ngModel)]="selectedEmployee?.gender" name="gender" value="Male" required /> Male</label>
+        <label><input type="radio" [(ngModel)]="selectedEmployee?.gender" name="gender" value="Female" required /> Female</label>
+        <label><input type="radio" [(ngModel)]="selectedEmployee?.gender" name="gender" value="Other" required /> Other</label>
+      </div>
+      <button type="submit">Save</button>
+      <button type="button" (click)="modal.dismiss('Cancel click')">Cancel</button>
+    </form>
+  </div>
+</ng-template>
