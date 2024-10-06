@@ -1,33 +1,88 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Department } from './department';
+import { Component, OnInit, TemplateRef } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Employee } from './employee'; // Ensure this path is correct
+import { EmployeeService } from './employee.service'; // Ensure this path is correct
 
-@Injectable({
-  providedIn: 'root',
+@Component({
+  selector: 'app-employee',
+  templateUrl: './employee.component.html',
+  styleUrls: ['./employee.component.css'],
 })
-export class DepartmentService {
-  private baseUrl = 'http://localhost:8080/api/departments'; // Change the URL if needed
+export class EmployeeComponent implements OnInit {
+  employees: Employee[] = [];
+  newEmployee: Employee = {
+    id: 0,
+    name: '',
+    dateOfBirth: '',
+    qualification: '',
+    city: '',
+    state: '',
+    pinCode: '',
+    gender: '',
+  };
+  selectedEmployee: Employee | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private employeeService: EmployeeService, private modalService: NgbModal) {}
 
-  // Fetch all departments
-  getDepartments(): Observable<Department[]> {
-    return this.http.get<Department[]>(this.baseUrl);
+  ngOnInit(): void {
+    this.loadEmployees();
   }
 
-  // Add a new department
-  addDepartment(department: Department): Observable<Department> {
-    return this.http.post<Department>(this.baseUrl, department);
+  loadEmployees(): void {
+    this.employeeService.getEmployees().subscribe((data) => {
+      this.employees = data;
+    });
   }
 
-  // Update an existing department
-  updateDepartment(id: number, department: Department): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${id}`, department);
+  openAddEmployeeModal(content: TemplateRef<any>): void {
+    this.newEmployee = {
+      id: 0,
+      name: '',
+      dateOfBirth: '',
+      qualification: '',
+      city: '',
+      state: '',
+      pinCode: '',
+      gender: '',
+    };
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
   }
 
-  // Delete a department by ID
-  deleteDepartment(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  openEditEmployeeModal(content: TemplateRef<any>, employee: Employee): void {
+    this.selectedEmployee = { ...employee }; // Clone the employee object
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+  }
+
+  saveEmployee(formValue: any): void {
+    if (this.selectedEmployee) {
+      // Update existing employee
+      this.employeeService.updateEmployee(this.selectedEmployee.id, formValue).subscribe(() => {
+        this.loadEmployees();
+        this.selectedEmployee = null; // Clear the selected employee after saving
+      });
+    } else {
+      // Add new employee
+      this.employeeService.addEmployee(formValue).subscribe((employee) => {
+        this.employees.push(employee);
+        this.newEmployee = {
+          id: 0,
+          name: '',
+          dateOfBirth: '',
+          qualification: '',
+          city: '',
+          state: '',
+          pinCode: '',
+          gender: '',
+        }; // Reset the form
+      });
+    }
+  }
+
+  deleteEmployee(id: number): void {
+    if (confirm('Are you sure you want to delete this employee?')) {
+      this.employeeService.deleteEmployee(id).subscribe(() => {
+        this.employees = this.employees.filter((e) => e.id !== id);
+      });
+    }
   }
 }
