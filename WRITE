@@ -1,88 +1,140 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Employee } from './employee'; // Ensure this path is correct
-import { EmployeeService } from './employee.service'; // Ensure this path is correct
+<div>
+  <h2>Employee Management</h2>
+  <button (click)="openAddEmployeeModal(addEmployeeModal)">Add Employee</button>
+  <table>
+    <tr>
+      <th>Employee Name</th>
+      <th>Date of Birth</th>
+      <th>Qualification</th>
+      <th>City</th>
+      <th>State</th>
+      <th>Pin Code</th>
+      <th>Gender</th>
+      <th>Department</th>
+      <th>Actions</th>
+    </tr>
+    <tr *ngFor="let employee of employees">
+      <td><a (click)="openEditEmployeeModal(editEmployeeModal, employee)">{{ employee.name }}</a></td>
+      <td>{{ employee.dateOfBirth | date }}</td>
+      <td>{{ employee.qualification }}</td>
+      <td>{{ employee.city }}</td>
+      <td>{{ employee.state }}</td>
+      <td>{{ employee.pinCode }}</td>
+      <td>{{ employee.gender }}</td>
+      <td>{{ employee.departmentName }}</td>
+      <td>
+        <button (click)="deleteEmployee(employee.id)">Delete</button>
+      </td>
+    </tr>
+  </table>
 
-@Component({
-  selector: 'app-employee',
-  templateUrl: './employee.component.html',
-  styleUrls: ['./employee.component.css'],
-})
-export class EmployeeComponent implements OnInit {
-  employees: Employee[] = [];
-  newEmployee: Employee = {
-    id: 0,
-    name: '',
-    dateOfBirth: '',
-    qualification: '',
-    city: '',
-    state: '',
-    pinCode: '',
-    gender: '',
-  };
-  selectedEmployee: Employee | null = null;
+  <!-- Add Employee Modal -->
+  <ng-template #addEmployeeModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Add Employee</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="saveEmployee(newEmployee)">
+        <input type="text" [(ngModel)]="newEmployee.name" name="name" placeholder="Employee Name" required />
+        <input type="date" [(ngModel)]="newEmployee.dateOfBirth" name="dob" required />
+        <input type="text" [(ngModel)]="newEmployee.qualification" name="qualification" placeholder="Qualification" />
+        <input type="text" [(ngModel)]="newEmployee.city" name="city" placeholder="City" />
+        <input type="text" [(ngModel)]="newEmployee.state" name="state" placeholder="State" />
+        <input type="text" [(ngModel)]="newEmployee.pinCode" name="pinCode" placeholder="Pin Code" />
+        <div>
+          <label>Gender:</label>
+          <input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Male" required /> Male
+          <input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Female" required /> Female
+          <input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Other" required /> Other
+        </div>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </ng-template>
 
-  constructor(private employeeService: EmployeeService, private modalService: NgbModal) {}
+  <!-- Edit Employee Modal -->
+  <ng-template #editEmployeeModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Edit Employee</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="saveEmployee(selectedEmployee)">
+        <input type="text" [(ngModel)]="selectedEmployee?.name" name="name" placeholder="Employee Name" required />
+        <input type="date" [(ngModel)]="selectedEmployee?.dateOfBirth" name="dob" required />
+        <input type="text" [(ngModel)]="selectedEmployee?.qualification" name="qualification" placeholder="Qualification" />
+        <input type="text" [(ngModel)]="selectedEmployee?.city" name="city" placeholder="City" />
+        <input type="text" [(ngModel)]="selectedEmployee?.state" name="state" placeholder="State" />
+        <input type="text" [(ngModel)]="selectedEmployee?.pinCode" name="pinCode" placeholder="Pin Code" />
+        <div>
+          <label>Gender:</label>
+          <input type="radio" [(ngModel)]="selectedEmployee?.gender" name="gender" value="Male" required /> Male
+          <input type="radio" [(ngModel)]="selectedEmployee?.gender" name="gender" value="Female" required /> Female
+          <input type="radio" [(ngModel)]="selectedEmployee?.gender" name="gender" value="Other" required /> Other
+        </div>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </ng-template>
+</div>
 
-  ngOnInit(): void {
-    this.loadEmployees();
-  }
 
-  loadEmployees(): void {
-    this.employeeService.getEmployees().subscribe((data) => {
-      this.employees = data;
-    });
-  }
 
-  openAddEmployeeModal(content: TemplateRef<any>): void {
-    this.newEmployee = {
-      id: 0,
-      name: '',
-      dateOfBirth: '',
-      qualification: '',
-      city: '',
-      state: '',
-      pinCode: '',
-      gender: '',
-    };
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
-  }
 
-  openEditEmployeeModal(content: TemplateRef<any>, employee: Employee): void {
-    this.selectedEmployee = { ...employee }; // Clone the employee object
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
-  }
 
-  saveEmployee(formValue: any): void {
-    if (this.selectedEmployee) {
-      // Update existing employee
-      this.employeeService.updateEmployee(this.selectedEmployee.id, formValue).subscribe(() => {
-        this.loadEmployees();
-        this.selectedEmployee = null; // Clear the selected employee after saving
-      });
-    } else {
-      // Add new employee
-      this.employeeService.addEmployee(formValue).subscribe((employee) => {
-        this.employees.push(employee);
-        this.newEmployee = {
-          id: 0,
-          name: '',
-          dateOfBirth: '',
-          qualification: '',
-          city: '',
-          state: '',
-          pinCode: '',
-          gender: '',
-        }; // Reset the form
-      });
-    }
-  }
 
-  deleteEmployee(id: number): void {
-    if (confirm('Are you sure you want to delete this employee?')) {
-      this.employeeService.deleteEmployee(id).subscribe(() => {
-        this.employees = this.employees.filter((e) => e.id !== id);
-      });
-    }
-  }
+
+
+
+/* employee.component.css */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+button {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049; /* Darker green */
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+}
+
+input[type="text"], input[type="date"] {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
