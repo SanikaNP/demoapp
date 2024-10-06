@@ -15,10 +15,8 @@
           "options": {
             "outputPath": "dist/emp-management",
             "index": "src/index.html",
-            "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts", // Changed from array to path
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
