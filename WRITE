@@ -1,67 +1,93 @@
-/* Basic reset for margins and padding */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-}
+<div>
+  <h2>Employee Management</h2>
+  <button (click)="openAddEmployeeModal(addEmployeeModal)">Add Employee</button>
+  <button (click)="exportEmployees()">Export to Excel</button>
 
-h2 {
-    text-align: center;
-    margin-bottom: 20px;
-}
+  <table>
+    <thead>
+      <tr>
+        <th>Employee Name</th>
+        <th>Date of Birth</th>
+        <th>Qualification</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Pin Code</th>
+        <th>Gender</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let employee of employees">
+        <td (click)="openEditEmployeeModal(editEmployeeModal, employee)">{{ employee.name }}</td>
+        <td>{{ employee.dateOfBirth }}</td>
+        <td>{{ employee.qualification }}</td>
+        <td>{{ employee.city }}</td>
+        <td>{{ employee.state }}</td>
+        <td>{{ employee.pinCode }}</td>
+        <td>{{ employee.gender }}</td>
+        <td>
+          <button (click)="deleteEmployee(employee.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-/* Form styles */
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
-}
+<!-- Modal for Adding/Editing Employee -->
+<ng-template #addEmployeeModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Add Employee</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #employeeForm="ngForm" (ngSubmit)="saveEmployee(newEmployee)">
+      <input type="text" [(ngModel)]="newEmployee.name" name="name" placeholder="Employee Name" required maxlength="100" />
+      <input type="date" [(ngModel)]="newEmployee.dateOfBirth" name="dob" required />
+      <input type="text" [(ngModel)]="newEmployee.qualification" name="qualification" placeholder="Qualification" />
+      <input type="text" [(ngModel)]="newEmployee.city" name="city" placeholder="City" />
+      <select [(ngModel)]="newEmployee.state" name="state">
+        <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+      </select>
+      <input type="text" [(ngModel)]="newEmployee.pinCode" name="pinCode" placeholder="Pin Code" />
+      <div>
+        <label>Gender:</label>
+        <label><input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Male" required /> Male</label>
+        <label><input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Female" required /> Female</label>
+        <label><input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Other" required /> Other</label>
+      </div>
+      <button type="submit">Save</button>
+      <button type="button" (click)="modal.dismiss('Cancel click')">Cancel</button>
+    </form>
+  </div>
+</ng-template>
 
-input[type="text"],
-textarea {
-    width: 80%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-button {
-    background-color: #007bff; /* Bootstrap primary color */
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #0056b3; /* Darker shade for hover */
-}
-
-/* Table styles */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-th, td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-    input[type="text"],
-    textarea {
-        width: 95%; /* Adjust input width for smaller screens */
-    }
-}
+<ng-template #editEmployeeModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Edit Employee</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form #employeeEditForm="ngForm" (ngSubmit)="saveEmployee(selectedEmployee)">
+      <input type="text" [(ngModel)]="selectedEmployee.name" name="name" placeholder="Employee Name" required maxlength="100" />
+      <input type="date" [(ngModel)]="selectedEmployee.dateOfBirth" name="dob" required />
+      <input type="text" [(ngModel)]="selectedEmployee.qualification" name="qualification" placeholder="Qualification" />
+      <input type="text" [(ngModel)]="selectedEmployee.city" name="city" placeholder="City" />
+      <select [(ngModel)]="selectedEmployee.state" name="state">
+        <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+      </select>
+      <input type="text" [(ngModel)]="selectedEmployee.pinCode" name="pinCode" placeholder="Pin Code" />
+      <div>
+        <label>Gender:</label>
+        <label><input type="radio" [(ngModel)]="selectedEmployee.gender" name="gender" value="Male" required /> Male</label>
+        <label><input type="radio" [(ngModel)]="selectedEmployee.gender" name="gender" value="Female" required /> Female</label>
+        <label><input type="radio" [(ngModel)]="selectedEmployee.gender" name="gender" value="Other" required /> Other</label>
+      </div>
+      <button type="submit">Save</button>
+      <button type="button" (click)="modal.dismiss('Cancel click')">Cancel</button>
+    </form>
+  </div>
+</ng-template>
