@@ -1,417 +1,65 @@
-!---chevk---
-APP.MODULE.TS
-
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
-import { RouterModule, Routes } from '@angular/router';
-
-import { AppComponent } from './app.component';
-import { EmployeeComponent } from './employee/employee.component';
-import { DepartmentComponent } from './department/department.component'; // Ensure this path is correct
-
-// Define your application routes
-const routes: Routes = [
-  { path: 'employees', component: EmployeeComponent },
-  { path: 'departments', component: DepartmentComponent },
-  { path: '', redirectTo: '/employees', pathMatch: 'full' }, // Default route
-];
-
-@NgModule({
-  declarations: [
-    AppComponent,
-    EmployeeComponent,
-    DepartmentComponent,
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule,
-    RouterModule.forRoot(routes), // Ensure this is here
-  ],
-  providers: [],
-  bootstrap: [AppComponent],
-})
-export class AppModule {}
----------------------------------------------------=========================================================================
-
-APP.COMPONENT.TS
-
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
-})
-export class AppComponent {
-  title = 'Employee Management';
-}
-=============================================================================================
-
-APP.COMPO.HTML
-
-<nav>
-  <ul>
-    <li><a routerLink="/employees">Employees</a></li>
-    <li><a routerLink="/departments">Departments</a></li>
-  </ul>
-</nav>
-<router-outlet></router-outlet>
-================================================================================================
-
-APP.ROUTING.MODUE.TS
-
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { EmployeeComponent } from './employee/employee.component';
-import { DepartmentComponent } from './department/department.component';
-
-const routes: Routes = [
-  { path: '', redirectTo: '/employees', pathMatch: 'full' }, // Default route
-  { path: 'employees', component: EmployeeComponent },
-  { path: 'departments', component: DepartmentComponent },
-];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
-})
-export class AppRoutingModule {}
-============================================================================================
-
-DEPT.COMP.HTML
-
 <div>
-        <h2>Department Management</h2>
-        <form (ngSubmit)="addDepartment()">
-          <input type="text" [(ngModel)]="newDepartment.name" name="name" placeholder="Department Name" required />
-          <textarea [(ngModel)]="newDepartment.shortDescription" name="description" placeholder="Short Description"></textarea>
-          <button type="submit">Add Department</button>
-        </form>
-        
-        <table>
-          <tr>
-            <th>Department Name</th>
-            <th>Short Description</th>
-            <th>Actions</th>
-          </tr>
-          <tr *ngFor="let department of departments">
-            <td>{{ department.name }}</td>
-            <td>{{ department.shortDescription }}</td>
-            <td>
-              <button (click)="deleteDepartment(department.id!)">Delete</button> <!-- Add non-null assertion operator -->
-            </td>
-          </tr>
-        </table>
-      </div>
-      =======================================================================================================================
+  <h2>Department Management</h2>
+  <button (click)="openAddDepartmentModal(addDepartmentModal)">Add Department</button>
+  
+  <table>
+    <tr>
+      <th>Department Name</th>
+      <th>Short Description</th>
+      <th>Number of Employees</th>
+      <th>Actions</th>
+    </tr>
+    <tr *ngFor="let department of departments">
+      <td (click)="openEditDepartmentModal(editDepartmentModal, department)">{{ department.name }}</td>
+      <td>{{ department.shortDescription }}</td>
+      <td>{{ department.numberOfEmployees }}</td>
+      <td>
+        <button (click)="deleteDepartment(department.id!)">Delete</button>
+      </td>
+    </tr>
+  </table>
 
-DEPT.COMP.TS
+  <!-- Add Department Modal -->
+  <ng-template #addDepartmentModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Add Department</h4>
+      <button type="button" class="close" (click)="modal.dismiss('Cross click')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form #departmentForm="ngForm" (ngSubmit)="saveDepartment(departmentForm.value)">
+        <div>
+          <label>Department Name:</label>
+          <input type="text" name="name" [(ngModel)]="newDepartment.name" placeholder="Department Name" required maxlength="200" />
+        </div>
+        <div>
+          <label>Short Description:</label>
+          <textarea name="description" [(ngModel)]="newDepartment.shortDescription" placeholder="Short Description"></textarea>
+        </div>
+        <button type="submit">Save</button>
+        <button type="button" (click)="modal.dismiss('Close click')">Cancel</button>
+      </form>
+    </div>
+  </ng-template>
 
-import { Component, OnInit } from '@angular/core';
-import { Department } from './department'; // Adjust path if department.ts is in the same folder
-import { DepartmentService } from './department.service'; // Adjust path if department.service.ts is in the same folder
-
-
-@Component({
-  selector: 'app-department',
-  templateUrl: './department.component.html',
-  styleUrls: ['./department.component.css'],
-})
-export class DepartmentComponent implements OnInit {
-  departments: Department[] = [];
-  newDepartment: Department = {
-    name: '',
-    shortDescription: '',
-    id: 0
-  };
-
-  constructor(private departmentService: DepartmentService) {}
-
-  ngOnInit(): void {
-    this.loadDepartments();
-  }
-
-  loadDepartments(): void {
-    this.departmentService.getDepartments().subscribe((data) => {
-      this.departments = data;
-    });
-  }
-
-  addDepartment(): void {
-    this.departmentService.addDepartment(this.newDepartment).subscribe((department) => {
-      this.departments.push(department);
-      this.newDepartment = {
-        name: '',
-        shortDescription: '',
-      };
-    });
-  }
-
-  deleteDepartment(id: number): void {
-    this.departmentService.deleteDepartment(id).subscribe(() => {
-      this.departments = this.departments.filter((d) => d.id !== id);
-    });
-  }
-}
-==================================================================
-
-DEPT.SERVCI.TS
-
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Department } from './department';
-
-@Injectable({
-  providedIn: 'root',
-})
-export class DepartmentService {
-  private baseUrl = 'http://localhost:8080/api/departments'; // Change the URL if needed
-
-  constructor(private http: HttpClient) {}
-
-  getDepartments(): Observable<Department[]> {
-    return this.http.get<Department[]>(this.baseUrl);
-  }
-
-  addDepartment(department: Department): Observable<Department> {
-    return this.http.post<Department>(this.baseUrl, department);
-  }
-
-  deleteDepartment(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
-  }
-}
-==============================================================
-DEPT.TS
-
-export interface Department {
-        id?: number; // Optional for new departments
-        name: string;
-        shortDescription: string;
-      }
-      ========================================================
-
-EMP.COMP.HTML
-
-<div>
-        <h2>Employee Management</h2>
-        
-        <form (ngSubmit)="addEmployee()">
-          <input type="text" [(ngModel)]="newEmployee.name" name="name" placeholder="Employee Name" required />
-          <input type="date" [(ngModel)]="newEmployee.dateOfBirth" name="dob" required />
-          <input type="text" [(ngModel)]="newEmployee.qualification" name="qualification" placeholder="Qualification" />
-          <input type="text" [(ngModel)]="newEmployee.city" name="city" placeholder="City" />
-          <input type="text" [(ngModel)]="newEmployee.state" name="state" placeholder="State" />
-          <input type="text" [(ngModel)]="newEmployee.pinCode" name="pinCode" placeholder="Pin Code" />
-          <select [(ngModel)]="newEmployee.gender" name="gender" required>
-            <option value="" disabled>Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-          <button type="submit">Add Employee</button>
-        </form>
-        
-        <table>
-          <tr>
-            <th>Employee Name</th>
-            <th>Date of Birth</th>
-            <th>Qualification</th>
-            <th>City</th>
-            <th>State</th>
-            <th>Pin Code</th>
-            <th>Gender</th>
-            <th>Actions</th>
-          </tr>
-          <tr *ngFor="let employee of employees">
-            <td>{{ employee.name }}</td>
-            <td>{{ employee.dateOfBirth }}</td>
-            <td>{{ employee.qualification }}</td>
-            <td>{{ employee.city }}</td>
-            <td>{{ employee.state }}</td>
-            <td>{{ employee.pinCode }}</td>
-            <td>{{ employee.gender }}</td>
-            <td>
-              <button (click)="employee.id !== undefined && deleteEmployee(employee.id)">Delete</button>
-            </td>
-          </tr>
-        </table>
-      </div>
-      =====================================================================
-EMP COMP. TS
-
-import { Component, OnInit } from '@angular/core';
-import { Employee } from './employee'; // Ensure this path is correct
-import { EmployeeService } from './employee.service'; // Ensure this path is correct
-
-@Component({
-  selector: 'app-employee',
-  templateUrl: './employee.component.html',
-  styleUrls: ['./employee.component.css'],
-})
-export class EmployeeComponent implements OnInit {
-  employees: Employee[] = [];
-  newEmployee: Employee = {
-    id: 0,
-    name: '',
-    dateOfBirth: '',
-    qualification: '',
-    city: '',
-    state: '',
-    pinCode: '',
-    gender: '',
-  };
-
-  constructor(private employeeService: EmployeeService) {}
-
-  ngOnInit(): void {
-    this.loadEmployees();
-  }
-
-  loadEmployees(): void {
-    this.employeeService.getEmployees().subscribe((data) => {
-      this.employees = data;
-    });
-  }
-
-  addEmployee(): void {
-    this.employeeService.addEmployee(this.newEmployee).subscribe((employee) => {
-      this.employees.push(employee);
-      this.newEmployee = {
-        id: 0,
-        name: '',
-        dateOfBirth: '',
-        qualification: '',
-        city: '',
-        state: '',
-        pinCode: '',
-        gender: '',
-      };
-    });
-  }
-
-  deleteEmployee(id: number): void {
-    this.employeeService.deleteEmployee(id).subscribe(() => {
-      this.employees = this.employees.filter((e) => e.id !== id);
-    });
-  }
-}
-=============================================
-EMP.SERVICE.TS
-
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Employee } from './employee';
-
-@Injectable({
-  providedIn: 'root',
-})
-export class EmployeeService {
-  private baseUrl = 'http://localhost:8080/api/employees'; // Change the URL if needed
-
-  constructor(private http: HttpClient) {}
-
-  getEmployees(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(this.baseUrl);
-  }
-
-  addEmployee(employee: Employee): Observable<Employee> {
-    return this.http.post<Employee>(this.baseUrl, employee);
-  }
-
-  deleteEmployee(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
-  }
-}
-=======================================================
-EMP.TS
-
-// employee.ts
-export interface Employee {
-        id?: number; // Optional for new employees
-        name: string;
-        dateOfBirth: string; // Use a string for date representation
-        qualification: string;
-        city: string;
-        state: string;
-        pinCode: string;
-        gender: string;
-        departmentId?: number; // Link to department
-      }
-
-
-
-====================================================================================================
-
-
-header.component.ts
-typescript
-Copy code
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
-})
-export class HeaderComponent {
-  title = 'Employee Management System';
-}
-2. header.component.html
-html
-Copy code
-<header>
-  <nav>
-    <h1>{{ title }}</h1>
-    <ul>
-      <li><a routerLink="/employees" routerLinkActive="active">Employees</a></li>
-      <li><a routerLink="/departments" routerLinkActive="active">Departments</a></li>
-    </ul>
-  </nav>
-</header>
-3. header.component.css
-css
-Copy code
-header {
-  background-color: #333;
-  color: white;
-  padding: 1rem;
-  text-align: center;
-}
-
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-nav h1 {
-  margin: 0;
-}
-
-nav ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-}
-
-nav ul li {
-  margin-left: 20px;
-}
-
-nav ul li a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-nav ul li a.active {
-  border-bottom: 2px solid yellow;
-}
-      
+  <!-- Edit Department Modal -->
+  <ng-template #editDepartmentModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Edit Department</h4>
+      <button type="button" class="close" (click)="modal.dismiss('Cross click')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form #departmentForm="ngForm" (ngSubmit)="saveDepartment(departmentForm.value)">
+        <div>
+          <label>Department Name:</label>
+          <input type="text" name="name" [(ngModel)]="selectedDepartment.name" placeholder="Department Name" required maxlength="200" />
+        </div>
+        <div>
+          <label>Short Description:</label>
+          <textarea name="description" [(ngModel)]="selectedDepartment.shortDescription" placeholder="Short Description"></textarea>
+        </div>
+        <button type="submit">Save</button>
+        <button type="button" (click)="modal.dismiss('Close click')">Cancel</button>
+      </form>
+    </div>
+  </ng-template>
+</div>
