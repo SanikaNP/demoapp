@@ -1,140 +1,67 @@
-<div>
-  <h2>Employee Management</h2>
-  <button (click)="openAddEmployeeModal(addEmployeeModal)">Add Employee</button>
-  <table>
-    <tr>
-      <th>Employee Name</th>
-      <th>Date of Birth</th>
-      <th>Qualification</th>
-      <th>City</th>
-      <th>State</th>
-      <th>Pin Code</th>
-      <th>Gender</th>
-      <th>Department</th>
-      <th>Actions</th>
-    </tr>
-    <tr *ngFor="let employee of employees">
-      <td><a (click)="openEditEmployeeModal(editEmployeeModal, employee)">{{ employee.name }}</a></td>
-      <td>{{ employee.dateOfBirth | date }}</td>
-      <td>{{ employee.qualification }}</td>
-      <td>{{ employee.city }}</td>
-      <td>{{ employee.state }}</td>
-      <td>{{ employee.pinCode }}</td>
-      <td>{{ employee.gender }}</td>
-      <td>{{ employee.departmentName }}</td>
-      <td>
-        <button (click)="deleteEmployee(employee.id)">Delete</button>
-      </td>
-    </tr>
-  </table>
-
-  <!-- Add Employee Modal -->
-  <ng-template #addEmployeeModal let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Add Employee</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form (ngSubmit)="saveEmployee(newEmployee)">
-        <input type="text" [(ngModel)]="newEmployee.name" name="name" placeholder="Employee Name" required />
-        <input type="date" [(ngModel)]="newEmployee.dateOfBirth" name="dob" required />
-        <input type="text" [(ngModel)]="newEmployee.qualification" name="qualification" placeholder="Qualification" />
-        <input type="text" [(ngModel)]="newEmployee.city" name="city" placeholder="City" />
-        <input type="text" [(ngModel)]="newEmployee.state" name="state" placeholder="State" />
-        <input type="text" [(ngModel)]="newEmployee.pinCode" name="pinCode" placeholder="Pin Code" />
-        <div>
-          <label>Gender:</label>
-          <input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Male" required /> Male
-          <input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Female" required /> Female
-          <input type="radio" [(ngModel)]="newEmployee.gender" name="gender" value="Other" required /> Other
-        </div>
-        <button type="submit">Save</button>
-      </form>
-    </div>
-  </ng-template>
-
-  <!-- Edit Employee Modal -->
-  <ng-template #editEmployeeModal let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Edit Employee</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <form (ngSubmit)="saveEmployee(selectedEmployee)">
-        <input type="text" [(ngModel)]="selectedEmployee?.name" name="name" placeholder="Employee Name" required />
-        <input type="date" [(ngModel)]="selectedEmployee?.dateOfBirth" name="dob" required />
-        <input type="text" [(ngModel)]="selectedEmployee?.qualification" name="qualification" placeholder="Qualification" />
-        <input type="text" [(ngModel)]="selectedEmployee?.city" name="city" placeholder="City" />
-        <input type="text" [(ngModel)]="selectedEmployee?.state" name="state" placeholder="State" />
-        <input type="text" [(ngModel)]="selectedEmployee?.pinCode" name="pinCode" placeholder="Pin Code" />
-        <div>
-          <label>Gender:</label>
-          <input type="radio" [(ngModel)]="selectedEmployee?.gender" name="gender" value="Male" required /> Male
-          <input type="radio" [(ngModel)]="selectedEmployee?.gender" name="gender" value="Female" required /> Female
-          <input type="radio" [(ngModel)]="selectedEmployee?.gender" name="gender" value="Other" required /> Other
-        </div>
-        <button type="submit">Save</button>
-      </form>
-    </div>
-  </ng-template>
-</div>
-
-
-
-
-
-
-
-
-
-/* employee.component.css */
-
-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Basic reset for margins and padding */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
 }
 
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-th {
-  background-color: #f2f2f2;
+/* Form styles */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+textarea {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 button {
-  background-color: #4CAF50; /* Green */
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    background-color: #007bff; /* Bootstrap primary color */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-  background-color: #45a049; /* Darker green */
+    background-color: #0056b3; /* Darker shade for hover */
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* Table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
 }
 
-.modal-body {
-  display: flex;
-  flex-direction: column;
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
 }
 
-input[type="text"], input[type="date"] {
-  margin-bottom: 10px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+th {
+    background-color: #f2f2f2;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    input[type="text"],
+    textarea {
+        width: 95%; /* Adjust input width for smaller screens */
+    }
 }
