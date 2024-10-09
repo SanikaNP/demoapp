@@ -1,102 +1,94 @@
-{
-  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-  "version": 1,
-  "newProjectRoot": "projects",
-  "projects": {
-    "emp-management": {
-      "projectType": "application",
-      "schematics": {},
-      "root": "",
-      "sourceRoot": "src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:application",
-          "options": {
-            "outputPath": "dist/emp-management",
-            "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": "src/polyfills.ts", // Changed from array to path
-            "tsConfig": "tsconfig.app.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "prerender": true,
-            "ssr": {
-              "entry": "server.ts"
-            }
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "2kB",
-                  "maximumError": "4kB"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "emp-management:build:production"
-            },
-            "development": {
-              "buildTarget": "emp-management:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.css"
-            ],
-            "scripts": []
-          }
-        }
-      }
-    }
-  },
-  "cli": {
-    "analytics": "8fdd6d95-ff11-4f40-ae55-e6691c872df2"
-  }
+Got it! Let's create a simple Angular project using AG Grid from scratch.
+
+Step 1: Create a new Angular project
+If you don't have the Angular CLI installed, install it by running:
+
+bash
+Copy code
+npm install -g @angular/cli
+Now, create a new Angular project:
+
+bash
+Copy code
+ng new ag-grid-demo
+cd ag-grid-demo
+Step 2: Install AG Grid
+Inside the project directory, install the ag-grid-angular package:
+
+bash
+Copy code
+npm install ag-grid-angular ag-grid-community
+Step 3: Set up AG Grid in Angular
+We will now integrate AG Grid into your project.
+
+src/app/app.module.ts
+Make sure to import AgGridModule in your AppModule.
+
+typescript
+Copy code
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { AgGridModule } from 'ag-grid-angular';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    AgGridModule.withComponents([]), // Import AG Grid Module
+  ],
+  providers: [],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}
+src/app/app.component.ts
+Now, let's create a component with AG Grid. We’ll define column headers and sample row data for this example.
+
+typescript
+Copy code
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+})
+export class AppComponent {
+  columnDefs = [
+    { headerName: 'Make', field: 'make' },
+    { headerName: 'Model', field: 'model' },
+    { headerName: 'Price', field: 'price' },
+  ];
+
+  rowData = [
+    { make: 'Toyota', model: 'Celica', price: 35000 },
+    { make: 'Ford', model: 'Mondeo', price: 32000 },
+    { make: 'Porsche', model: 'Boxster', price: 72000 },
+  ];
 }
+src/app/app.component.html
+This is the HTML template where the AG Grid table is displayed.
+
+html
+Copy code
+<h1>AG Grid Example</h1>
+<ag-grid-angular
+  style="width: 100%; height: 500px;"
+  class="ag-theme-alpine"
+  [rowData]="rowData"
+  [columnDefs]="columnDefs"
+  rowSelection="multiple"
+  [animateRows]="true"
+></ag-grid-angular>
+src/app/app.component.css
+You can add some basic styling or leave it empty for now.
+
+css
+Copy code
+/* Optional custom styles */
+Step 4: Run the project
+Once everything is set up, you can run your Angular project:
+
+bash
+Copy code
+ng serve
