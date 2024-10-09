@@ -1,8 +1,61 @@
-template: `
-    <ag-grid-angular
-      class="ag-theme-quartz"
-      style="height: 500px;"
-      [rowData]="rowData"
-      [columnDefs]="columnDefs">
-    </ag-grid-angular>
-  `,
+3. Update app.module.ts
+Import AgGridModule in your app.module.ts:
+
+typescript
+Copy code
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { AgGridModule } from 'ag-grid-angular';
+import 'ag-grid-enterprise';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    AgGridModule.withComponents([])  // Include AG Grid here
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+4. Update app.component.ts
+Define some sample data and column definitions for the grid in your app.component.ts:
+
+typescript
+Copy code
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  columnDefs = [
+    { field: 'make', sortable: true, filter: true },
+    { field: 'model', sortable: true, filter: true },
+    { field: 'price', sortable: true, filter: true }
+  ];
+
+  rowData = [
+    { make: 'Toyota', model: 'Celica', price: 35000 },
+    { make: 'Ford', model: 'Mondeo', price: 32000 },
+    { make: 'Porsche', model: 'Boxster', price: 72000 }
+  ];
+}
+5. Update app.component.html
+Use the ag-grid-angular component to display the grid in app.component.html:
+
+html
+Copy code
+<ag-grid-angular
+  style="width: 100%; height: 350px;"
+  class="ag-theme-alpine"
+  [rowData]="rowData"
+  [columnDefs]="columnDefs"
+  [pagination]="true"
+  [paginationPageSize]="10">
+</ag-grid-angular>
