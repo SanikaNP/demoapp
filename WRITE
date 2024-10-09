@@ -1,4 +1,4 @@
-Step 1: app.component.ts
+Updated app.component.ts (with Row Grouping):
 typescript
 Copy code
 import { Component } from '@angular/core';
@@ -6,24 +6,28 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  mergeAthlete = false;
-  mergeCountry = false;
-
   columnDefs = [
-    { field: 'athlete', rowSpan: this.rowSpanAthlete.bind(this) },
-    { field: 'age' },
-    { field: 'country', rowSpan: this.rowSpanCountry.bind(this) },
-    { field: 'year' },
-    { field: 'date' },
-    { field: 'sport' },
-    { field: 'gold' },
-    { field: 'silver' },
-    { field: 'bronze' },
-    { field: 'total' },
+    { field: 'athlete', sortable: true, filter: true, rowGroup: true, hide: true }, // Group by athlete
+    { field: 'age', sortable: true, filter: true },
+    { field: 'country', sortable: true, filter: true },
+    { field: 'year', sortable: true, filter: true },
+    { field: 'date', sortable: true, filter: true },
+    { field: 'sport', sortable: true, filter: true },
+    { field: 'gold', sortable: true, filter: true },
+    { field: 'silver', sortable: true, filter: true },
+    { field: 'bronze', sortable: true, filter: true },
+    { field: 'total', sortable: true, filter: true }
   ];
+
+  autoGroupColumnDef = {
+    headerName: 'Athlete',
+    field: 'athlete',
+    cellRenderer: 'agGroupCellRenderer',
+    cellRendererParams: { suppressCount: true }
+  };
 
   rowData = [
     { athlete: 'Michael Phelps', age: 23, country: 'USA', year: 2008, date: '24/08/2008', sport: 'Swimming', gold: 8, silver: 0, bronze: 0, total: 8 },
@@ -33,89 +37,19 @@ export class AppComponent {
     { athlete: 'Ryan Lochte', age: 24, country: 'USA', year: 2008, date: '24/08/2008', sport: 'Swimming', gold: 2, silver: 0, bronze: 2, total: 4 },
     { athlete: 'Ryan Lochte', age: 28, country: 'USA', year: 2012, date: '12/08/2012', sport: 'Swimming', gold: 2, silver: 1, bronze: 1, total: 4 }
   ];
-
-  gridOptions = {
-    defaultColDef: {
-      resizable: true,
-      sortable: true,
-      filter: true,
-    },
-    domLayout: 'autoHeight',
-  };
-
-  // Method to calculate rowSpan for 'athlete' column
-  rowSpanAthlete(params: any) {
-    if (this.mergeAthlete && (params.data.athlete === 'Michael Phelps' || params.data.athlete === 'Usain Bolt')) {
-      return 2;
-    }
-    return 1;
-  }
-
-  // Method to calculate rowSpan for 'country' column
-  rowSpanCountry(params: any) {
-    if (this.mergeCountry && (params.data.country === 'USA' || params.data.country === 'Jamaica')) {
-      return 2;
-    }
-    return 1;
-  }
-
-  // Method to trigger grid refresh when checkboxes are changed
-  onMergeChange() {
-    this.gridOptions.api.refreshCells({ force: true });
-  }
 }
-Step 2: app.component.html
+Updated app.component.html:
 html
 Copy code
-<div>
-  <label>
-    <input type="checkbox" [(ngModel)]="mergeAthlete" (change)="onMergeChange()" />
-    Merge Athlete
-  </label>
-  <label>
-    <input type="checkbox" [(ngModel)]="mergeCountry" (change)="onMergeChange()" />
-    Merge Country
-  </label>
-</div>
-
 <div style="width: 100%; height: 100%;">
   <ag-grid-angular
     style="width: 100%; height: 500px;"
     class="ag-theme-alpine"
     [rowData]="rowData"
     [columnDefs]="columnDefs"
-    [gridOptions]="gridOptions">
+    [autoGroupColumnDef]="autoGroupColumnDef"
+    rowSelection="multiple"
+    groupIncludeFooter="true"
+    pagination="true">
   </ag-grid-angular>
 </div>
-Step 3: app.component.css
-css
-Copy code
-.ag-theme-alpine {
-  height: 500px;
-  width: 100%;
-}
-Step 4: Install Dependencies
-Make sure to install the necessary dependencies if you haven't already:
-
-bash
-Copy code
-npm install --save ag-grid-angular ag-grid-community @angular/forms
-Step 5: Update app.module.ts
-In app.module.ts, include FormsModule for two-way binding of the checkboxes:
-
-typescript
-Copy code
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { AppComponent } from './app.component';
-import { AgGridModule } from 'ag-grid-angular';
-import { FormsModule } from '@angular/forms';
-import 'ag-grid-enterprise';  // For enterprise features like cell merging
-
-@NgModule({
-  declarations: [AppComponent],
-  imports: [BrowserModule, AgGridModule.withComponents([]), FormsModule],
-  providers: [],
-  bootstrap: [AppComponent],
-})
-export class AppModule {}
