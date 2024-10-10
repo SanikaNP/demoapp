@@ -65,21 +65,21 @@ export class AppComponent {
   ];
 
   rowData = [
-    { name: 'Abhinav Gupta', email: 'abhinav@gmail.com', value1: 5, value2: 6, value3: 7 },
-    { name: 'Amruta Patil', email: 'amruta@gmail.com', value1: 3, value2: 4, value3: 2 },
-    { name: 'Divyangna Singh', email: 'div@gmail.com', value1: 8, value2: 1, value3: 5 },
-    { name: 'Saloni Kumari', email: 'saloni@gmail.com', value1: 5, value2: 6, value3: 7 },
-    { name: 'Nisha Poonia', email: 'nisha@gmail.com', value1: 3, value2: 4, value3: 2 },
-    { name: 'Kunal Dahake', email: 'kunal@gmail.com', value1: 8, value2: 1, value3: 5 },
-    { name: 'Nisha Dhatak', email: 'nisha-d@gmail.com', value1: 5, value2: 6, value3: 7 },
-    { name: 'Shivangi Singh', email: 'shivangi@gmail.com', value1: 3, value2: 4, value3: 2 },
-    { name: 'Janvi Rathi', email: 'janvi@gmail.com', value1: 8, value2: 1, value3: 5 },
-    { name: 'Harsh Katiyar', email: 'harsh@gmail.com', value1: 5, value2: 6, value3: 7 },
-    { name: 'Omkar', email: 'omkar@gmail.com', value1: 3, value2: 4, value3: 2 },
-    { name: 'Mahesh Bhosale', email: 'mahesh@gmail.com', value1: 8, value2: 1, value3: 5 },
-    { name: 'Sumit Pawar', email: 'sumit@gmail.com', value1: 5, value2: 6, value3: 7 },
-    { name: 'Diksha Deswal', email: 'diksha@gmail.com', value1: 3, value2: 4, value3: 2 },
-    { name: 'Saurabh Rawat', email: 'saurabh@gmail.com', value1: 8, value2: 1, value3: 5 }
+    { name: 'Aria Moore', email: 'aria.moore@gmail.com', value1: 5, value2: 6, value3: 7 },
+      { name: 'Liam Johnson', email: 'liam.johnson@gmail.com', value1: 3, value2: 4, value3: 2 },
+      { name: 'Noah Davis', email: 'noah.davis@gmail.com', value1: 8, value2: 1, value3: 5 },
+      { name: 'Emma Brown', email: 'emma.brown@gmail.com', value1: 5, value2: 6, value3: 7 },
+      { name: 'Olivia Smith', email: 'olivia.smith@gmail.com', value1: 3, value2: 4, value3: 2 },
+      { name: 'Ava Wilson', email: 'ava.wilson@gmail.com', value1: 8, value2: 1, value3: 5 },
+      { name: 'Sophia Martin', email: 'sophia.martin@gmail.com', value1: 5, value2: 6, value3: 7 },
+      { name: 'Isabella Thompson', email: 'isabella.thompson@gmail.com', value1: 3, value2: 4, value3: 2 },
+      { name: 'Mia Garcia', email: 'mia.garcia@gmail.com', value1: 8, value2: 1, value3: 5 },
+      { name: 'Elijah Martinez', email: 'elijah.martinez@gmail.com', value1: 5, value2: 6, value3: 7 },
+      { name: 'James Lee', email: 'james.lee@gmail.com', value1: 3, value2: 4, value3: 2 },
+      { name: 'Benjamin Taylor', email: 'benjamin.taylor@gmail.com', value1: 8, value2: 1, value3: 5 },
+      { name: 'Lucas Anderson', email: 'lucas.anderson@gmail.com', value1: 5, value2: 6, value3: 7 },
+      { name: 'Amelia Hernandez', email: 'amelia.hernandez@gmail.com', value1: 3, value2: 4, value3: 2 },
+      { name: 'Mason White', email: 'mason.white@gmail.com', value1: 8, value2: 1, value3: 5 }
   ];
 
   menuVisible = false;
