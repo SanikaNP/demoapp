@@ -1,27 +1,188 @@
-"@ag-grid-community/angular": "~31.1.0",
-    "@ag-grid-community/client-side-row-model": "~31.1.0",
-    "@ag-grid-community/core": "~31.1.0",
-    "@ag-grid-community/styles": "~31.1.0",
-    "@ag-grid-enterprise/charts": "~31.1.0",
-    "@ag-grid-enterprise/column-tool-panel": "~31.1.0",
-    "@ag-grid-enterprise/core": "~31.1.0",
-    "@ag-grid-enterprise/filter-tool-panel": "~31.1.0",
-    "@ag-grid-enterprise/menu": "~31.1.0",
-    "@ag-grid-enterprise/range-selection": "~31.1.0",
-    "@ag-grid-enterprise/row-grouping": "~31.1.0",
-    "@ag-grid-enterprise/set-filter": "~31.1.0",
-    "@ag-grid-enterprise/side-bar": "~31.1.0",
-    "@ag-grid-enterprise/status-bar": "~31.1.0",
-    "@angular/animations": "^14.3.0",
-    "@angular/common": "^14.3.0",
-    "@angular/compiler": "^14.3.0",
-    "@angular/core": "^14.3.0",
-    "@angular/forms": "^14.3.0",
-    "@angular/platform-browser": "^14.3.0",
-    "@angular/platform-browser-dynamic": "^14.3.0",
-    "@angular/router": "^14.3.0",
-    "ag-grid-angular-cli-example": "file:",
-    "bootstrap": "4.5.0",
-    "rxjs": "~6.6.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.11.4"
+.button-container {
+  margin-bottom: 10px;
+}
+
+.button-container button {
+  margin-right: 10px;
+}
+
+
+<div class="menu-container">
+  <button (click)="toggleMenu()" class="menu-button">Menu</button>
+  <div *ngIf="menuVisible" class="dropdown-menu">
+    <button (click)="addRow()">Add Row</button>
+    <button (click)="calculate('add')">Add</button>
+    <button (click)="calculate('subtract')">Subtract</button>
+    <button (click)="calculate('multiply')">Multiply</button>
+    <button (click)="deleteRow()">Delete Row</button>
+  </div>
+</div>
+
+<ag-grid-angular
+  style="width: 100%; height: 500px;"
+  class="ag-theme-quartz"
+  [rowData]="rowData"
+  [columnDefs]="columnDefs"
+  (gridReady)="onGridReady($event)"
+  (rowClicked)="onRowClicked($event)"
+  [pagination]="true"
+  [paginationPageSize]="10"
+>
+</ag-grid-angular>
+
+
+
+
+import { Component } from '@angular/core';
+import { ColDef, GridApi, CellRange } from 'ag-grid-community';
+import { CommonModule } from '@angular/common';
+import { AgGridModule } from 'ag-grid-angular';
+import { FormsModule } from '@angular/forms';
+import { AgGridAngular } from 'ag-grid-angular';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [
+    CommonModule,
+    AgGridModule,
+    FormsModule,
+    AgGridAngular,
+  ],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  gridApi!: GridApi;
+
+  columnDefs: ColDef[] = [
+    { field: 'name', headerName: 'Name', editable: true, filter: true, floatingFilter: true, checkboxSelection: true },
+    { field: 'email', headerName: 'Email ID', editable: true, filter: true, floatingFilter: true },
+    { field: 'value1', headerName: 'Value 1', editable: true, filter: true, floatingFilter: true },
+    { field: 'value2', headerName: 'Value 2', editable: true, filter: true, floatingFilter: true },
+    { field: 'value3', headerName: 'Value 3', editable: true, filter: true, floatingFilter: true },
+  ];
+
+  rowData = [
+    { name: 'Abhinav Gupta', email: 'abhinav@gmail.com', value1: 5, value2: 6, value3: 7 },
+    { name: 'Amruta Patil', email: 'amruta@gmail.com', value1: 3, value2: 4, value3: 2 },
+    { name: 'Divyangna Singh', email: 'div@gmail.com', value1: 8, value2: 1, value3: 5 },
+    { name: 'Saloni Kumari', email: 'saloni@gmail.com', value1: 5, value2: 6, value3: 7 },
+    { name: 'Nisha Poonia', email: 'nisha@gmail.com', value1: 3, value2: 4, value3: 2 },
+    { name: 'Kunal Dahake', email: 'kunal@gmail.com', value1: 8, value2: 1, value3: 5 },
+    { name: 'Nisha Dhatak', email: 'nisha-d@gmail.com', value1: 5, value2: 6, value3: 7 },
+    { name: 'Shivangi Singh', email: 'shivangi@gmail.com', value1: 3, value2: 4, value3: 2 },
+    { name: 'Janvi Rathi', email: 'janvi@gmail.com', value1: 8, value2: 1, value3: 5 },
+    { name: 'Harsh Katiyar', email: 'harsh@gmail.com', value1: 5, value2: 6, value3: 7 },
+    { name: 'Omkar', email: 'omkar@gmail.com', value1: 3, value2: 4, value3: 2 },
+    { name: 'Mahesh Bhosale', email: 'mahesh@gmail.com', value1: 8, value2: 1, value3: 5 },
+    { name: 'Sumit Pawar', email: 'sumit@gmail.com', value1: 5, value2: 6, value3: 7 },
+    { name: 'Diksha Deswal', email: 'diksha@gmail.com', value1: 3, value2: 4, value3: 2 },
+    { name: 'Saurabh Rawat', email: 'saurabh@gmail.com', value1: 8, value2: 1, value3: 5 }
+  ];
+
+  menuVisible = false;
+
+  // Toggle menu visibility
+  toggleMenu() {
+    this.menuVisible = !this.menuVisible;
+  }
+
+  // Handle row click event
+  onRowClicked(event: any) {
+    // Optionally do something when a row is clicked
+  }
+
+  // Add a new row below the selected row
+  addRow() {
+    const selectedNodes = this.gridApi.getSelectedNodes();
+
+    if (selectedNodes.length === 0) {
+      alert('Please select a row to add a new row below it.');
+      return;
+    }
+
+    const selectedRowData = selectedNodes[0].data;
+    const selectedRowIndex = this.rowData.findIndex(row => row === selectedRowData);
+
+    // Create a new row with default values
+    const newRow = { name: 'New User', email: 'newuser@gmail.com', value1: 0, value2: 0, value3: 0 };
+
+    // Add the new row data below the selected row using applyTransaction
+    this.gridApi.applyTransaction({
+      add: [newRow],
+      addIndex: selectedRowIndex + 1 // Insert the new row at the desired position
+    });
+  }
+
+  // Delete the selected rows
+  deleteRow() {
+    const selectedNodes = this.gridApi.getSelectedNodes();
+
+    if (selectedNodes.length === 0) {
+      alert('Please select at least one row to delete.');
+      return;
+    }
+
+    // Get the data of the selected rows
+    const selectedData = selectedNodes.map(node => node.data);
+
+    // Remove the selected rows using applyTransaction
+    this.gridApi.applyTransaction({
+      remove: selectedData
+    });
+  }
+
+  calculate(operation: string) {
+    const selectedRanges: CellRange[] | null = this.gridApi.getCellRanges();
+    if (!selectedRanges || selectedRanges.length === 0) {
+      alert('Please select at least one cell to perform the operation.');
+      return;
+    }
+
+    selectedRanges.forEach((range: CellRange) => {
+      const startRow = range.startRow!.rowIndex;
+      const endRow = range.endRow!.rowIndex;
+
+      for (let rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
+        const rowNode = this.gridApi.getDisplayedRowAtIndex(rowIndex);
+        if (rowNode) {
+          range.columns.forEach((column) => {
+            const colId = column.getId();
+            const value = Number(rowNode.data[colId]);
+            let result: number;
+
+            switch (operation) {
+              case 'add':
+                result = value + 1; // Example operation
+                break;
+              case 'subtract':
+                result = value - 1; // Example operation
+                break;
+              case 'multiply':
+                result = value * 2; // Example operation
+                break;
+              case 'divide':
+                result = value / 2; // Example operation
+                break;
+              default:
+                result = value;
+            }
+
+            rowNode.setDataValue(colId, result);
+          });
+        }
+      }
+    });
+
+    this.gridApi.refreshCells();
+  }
+
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+  }
+}
+
+
+
