@@ -1,3 +1,5 @@
+app.component.css
+
 .button-container {
   margin-bottom: 10px;
 }
@@ -6,6 +8,9 @@
   margin-right: 10px;
 }
 
+===================================================================================================================================================================================================================
+
+APP.COMPONENT.HTML
 
 <div class="menu-container">
   <button (click)="toggleMenu()" class="menu-button">Menu</button>
@@ -31,7 +36,9 @@
 </ag-grid-angular>
 
 
+========================================================================================================================================================================================================================
 
+APP.COMPONENT.TS
 
 import { Component } from '@angular/core';
 import { ColDef, GridApi, CellRange } from 'ag-grid-community';
