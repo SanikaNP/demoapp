@@ -1,24 +1,52 @@
+import { ICellRendererAngularComp } from 'ag-grid-angular';
+
+export class CustomCellRenderer implements ICellRendererAngularComp {
+    private params: any;
+    private eGui: HTMLElement;
+
+    constructor() {
+        this.eGui = document.createElement('span');
+    }
+
+    agInit(params: any): void {
+        this.params = params;
+        this.eGui.innerHTML = this.params.value; // Display the value
+    }
+
+    getGui() {
+        return this.eGui;
+    }
+
+    refresh(params: any): boolean {
+        this.params = params;
+        this.eGui.innerHTML = this.params.value; // Update the value
+        return true;
+    }
+}
+
+
+
+
+
+
+
+
+
+
 toggleBold() {
     const focusedCell = this.gridApi.getFocusedCell();
     if (focusedCell) {
         const rowNode = focusedCell.rowNode;
         const column = focusedCell.column;
 
-        // Update the data in the grid
-        const cellData = rowNode.data[column.getColId()];
-        rowNode.setDataValue(column.getColId(), cellData); // Trigger cell update
-
-        // Update the styling for the focused cell
         const cellElement = this.gridApi.getCellRendererInstances({
             rowNodes: [rowNode],
-            columns: [column]
+            columns: [column],
         })[0];
 
         if (cellElement) {
-            // Apply bold styling
-            const currentWeight = cellElement.getGui().style.fontWeight;
-            cellElement.getGui().style.fontWeight = currentWeight === 'bold' ? 'normal' : 'bold';
-            this.gridApi.refreshCells({ force: true });
+            const isBold = cellElement.getGui().style.fontWeight === 'bold';
+            cellElement.getGui().style.fontWeight = isBold ? 'normal' : 'bold';
         }
     }
 }
@@ -29,21 +57,14 @@ toggleItalic() {
         const rowNode = focusedCell.rowNode;
         const column = focusedCell.column;
 
-        // Update the data in the grid
-        const cellData = rowNode.data[column.getColId()];
-        rowNode.setDataValue(column.getColId(), cellData); // Trigger cell update
-
-        // Update the styling for the focused cell
         const cellElement = this.gridApi.getCellRendererInstances({
             rowNodes: [rowNode],
-            columns: [column]
+            columns: [column],
         })[0];
 
         if (cellElement) {
-            // Apply italic styling
-            const currentStyle = cellElement.getGui().style.fontStyle;
-            cellElement.getGui().style.fontStyle = currentStyle === 'italic' ? 'normal' : 'italic';
-            this.gridApi.refreshCells({ force: true });
+            const isItalic = cellElement.getGui().style.fontStyle === 'italic';
+            cellElement.getGui().style.fontStyle = isItalic ? 'normal' : 'italic';
         }
     }
 }
@@ -54,21 +75,14 @@ toggleUnderline() {
         const rowNode = focusedCell.rowNode;
         const column = focusedCell.column;
 
-        // Update the data in the grid
-        const cellData = rowNode.data[column.getColId()];
-        rowNode.setDataValue(column.getColId(), cellData); // Trigger cell update
-
-        // Update the styling for the focused cell
         const cellElement = this.gridApi.getCellRendererInstances({
             rowNodes: [rowNode],
-            columns: [column]
+            columns: [column],
         })[0];
 
         if (cellElement) {
-            // Apply underline styling
-            const currentDecoration = cellElement.getGui().style.textDecoration;
-            cellElement.getGui().style.textDecoration = currentDecoration === 'underline' ? 'none' : 'underline';
-            this.gridApi.refreshCells({ force: true });
+            const isUnderlined = cellElement.getGui().style.textDecoration === 'underline';
+            cellElement.getGui().style.textDecoration = isUnderlined ? 'none' : 'underline';
         }
     }
 }
