@@ -1,30 +1,65 @@
+import { ICellRendererAngularComp } from 'ag-grid-angular';
+
+@Component({
+  selector: 'app-my-cell-renderer',
+  template: `
+    <div [ngStyle]="{'font-weight': cellData.bold ? 'bold' : 'normal', 
+                     'font-style': cellData.italic ? 'italic' : 'normal',
+                     'text-decoration': cellData.underline ? 'underline' : 'none'}">
+      {{ params.value }}
+    </div>
+  `,
+})
+export class MyCellRenderer implements ICellRendererAngularComp {
+  params: any;
+  cellData: { bold: boolean; italic: boolean; underline: boolean } = {
+    bold: false,
+    italic: false,
+    underline: false,
+  };
+
+  agInit(params: any): void {
+    this.params = params;
+    this.cellData = this.params.data[this.params.colDef.field] || this.cellData;
+  }
+
+  refresh(params: any): boolean {
+    this.params = params;
+    this.cellData = this.params.data[this.params.colDef.field] || this.cellData;
+    return true;
+  }
+}
+
+
+
+
+
+
+onCellClicked(event: any) {
+  this.selectedCell = {
+    rowIndex: event.rowIndex,
+    colId: event.colDef.field,
+    data: event.data,
+  };
+}
+
 toggleBold() {
-    if (this.selectedCell) {
-      const cellElement = this.getCellElement(this.selectedCell);
-      const isBold = cellElement.style.fontWeight === 'bold';
-      cellElement.style.fontWeight = isBold ? 'normal' : 'bold';
-    }
+  if (this.selectedCell) {
+    this.selectedCell.data[this.selectedCell.colId].bold = !this.selectedCell.data[this.selectedCell.colId].bold;
+    this.gridApi.refreshCells({ force: true }); // Refresh the cells to apply the changes
   }
+}
 
-  toggleItalic() {
-    if (this.selectedCell) {
-      const cellElement = this.getCellElement(this.selectedCell);
-      const isItalic = cellElement.style.fontStyle === 'italic';
-      cellElement.style.fontStyle = isItalic ? 'normal' : 'italic';
-    }
+toggleItalic() {
+  if (this.selectedCell) {
+    this.selectedCell.data[this.selectedCell.colId].italic = !this.selectedCell.data[this.selectedCell.colId].italic;
+    this.gridApi.refreshCells({ force: true });
   }
+}
 
-  toggleUnderline() {
-    if (this.selectedCell) {
-      const cellElement = this.getCellElement(this.selectedCell);
-      const isUnderlined = cellElement.style.textDecoration === 'underline';
-      cellElement.style.textDecoration = isUnderlined ? 'none' : 'underline';
-    }
-  }
-
-  private getCellElement(selectedCell: any): HTMLElement {
-    return document.querySelector(
-      `.ag-row[row-index="${selectedCell.rowIndex}"] .ag-cell[col-id="${selectedCell.column.colId}"]`
-    );
+toggleUnderline() {
+  if (this.selectedCell) {
+    this.selectedCell.data[this.selectedCell.colId].underline = !this.selectedCell.data[this.selectedCell.colId].underline;
+    this.gridApi.refreshCells({ force: true });
   }
 }
