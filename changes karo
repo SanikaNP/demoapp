@@ -1,32 +1,83 @@
-// Method to toggle bold formatting
-public toggleBold() {
-    const selectedNodes = this.api.getSelectedNodes();
-    if (selectedNodes.length > 0) {
-        selectedNodes.forEach(node => {
-            node.setDataValue('name', `<span style="font-weight: bold;">${node.data.name}</span>`);
-        });
-        this.api.refreshCells();
-    }
+/* Toolbar layout */
+.toolbar {
+    display: flex;
+    justify-content: space-between; /* Controls spacing between left and right sections */
+    align-items: center; /* Aligns all items in the center vertically */
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
-// Method to toggle italic formatting
-public toggleItalic() {
-    const selectedNodes = this.api.getSelectedNodes();
-    if (selectedNodes.length > 0) {
-        selectedNodes.forEach(node => {
-            node.setDataValue('name', `<span style="font-style: italic;">${node.data.name}</span>`);
-        });
-        this.api.refreshCells();
-    }
+/* Left section buttons */
+.left-buttons {
+    display: flex;
+    flex-direction: row; /* Align buttons horizontally */
+    gap: 10px; /* Space between buttons horizontally */
 }
 
-// Method to toggle underline formatting
-public toggleUnderline() {
-    const selectedNodes = this.api.getSelectedNodes();
-    if (selectedNodes.length > 0) {
-        selectedNodes.forEach(node => {
-            node.setDataValue('name', `<span style="text-decoration: underline;">${node.data.name}</span>`);
-        });
-        this.api.refreshCells();
-    }
+/* Buttons for row operations */
+.row-buttons {
+    display: flex;
+    gap: 10px; /* Space between Add Row and Delete Row buttons */
+}
+
+/* Quick filter section */
+.quick-filter-section {
+    display: flex;
+    align-items: center;
+    margin-right: 280px; 
+    margin-top: 10px; /* Adjust space above the Quick Filter */
+}
+
+/* Right section buttons */
+.right-buttons {
+    display: flex;
+    align-items: center; /* Align items in a row */
+}
+
+/* Download options */
+.download-options {
+    display: flex;
+    gap: 5px; /* Space between the download buttons */
+    font-size: 12px; /* Smaller font size for download options */
+    margin-left: 10px; /* Adjust the space between export and download options */
+}
+
+/* Button styling */
+button {
+    padding: 5px 10px; /* Padding for buttons */
+    background-color: #f0f0f0; /* Light gray background */
+    border: 1px solid #ccc; /* Border styling */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Button hover effect */
+button:hover {
+    background-color: #ddd; /* Darker gray on hover */
+}
+
+/* Button active effect */
+button:active {
+    background-color: #ccc; /* Even darker gray on active click */
+}
+
+/* Input styling for quick filter */
+.quick-filter-section input {
+    padding: 5px;
+    border: 1px solid #ccc; /* Border styling for input */
+    border-radius: 4px; /* Rounded corners for input */
+}
+
+/* Additional button styling for specific buttons */
+.left-buttons button:first-of-type, /* Target Bold button */
+.left-buttons button:nth-of-type(2) { /* Target Italic button */
+    background-color: #e7f3ff; /* Light blue background for formatting buttons */
+    color: #007bff; /* Blue text color */
+}
+
+/* Change color for formatting buttons on hover */
+.left-buttons button:first-of-type:hover,
+.left-buttons button:nth-of-type(2):hover {
+    background-color: #d4e6f1; /* Darker blue on hover */
 }
