@@ -1,88 +1,30 @@
-import { ICellRendererAngularComp } from 'ag-grid-angular';
-
-export class CustomCellRenderer implements ICellRendererAngularComp {
-    private params: any;
-    private eGui: HTMLElement;
-
-    constructor() {
-        this.eGui = document.createElement('span');
-    }
-
-    agInit(params: any): void {
-        this.params = params;
-        this.eGui.innerHTML = this.params.value; // Display the value
-    }
-
-    getGui() {
-        return this.eGui;
-    }
-
-    refresh(params: any): boolean {
-        this.params = params;
-        this.eGui.innerHTML = this.params.value; // Update the value
-        return true;
-    }
-}
-
-
-
-
-
-
-
-
-
-
 toggleBold() {
-    const focusedCell = this.gridApi.getFocusedCell();
-    if (focusedCell) {
-        const rowNode = focusedCell.rowNode;
-        const column = focusedCell.column;
-
-        const cellElement = this.gridApi.getCellRendererInstances({
-            rowNodes: [rowNode],
-            columns: [column],
-        })[0];
-
-        if (cellElement) {
-            const isBold = cellElement.getGui().style.fontWeight === 'bold';
-            cellElement.getGui().style.fontWeight = isBold ? 'normal' : 'bold';
-        }
+    if (this.selectedCell) {
+      const cellElement = this.getCellElement(this.selectedCell);
+      const isBold = cellElement.style.fontWeight === 'bold';
+      cellElement.style.fontWeight = isBold ? 'normal' : 'bold';
     }
-}
+  }
 
-toggleItalic() {
-    const focusedCell = this.gridApi.getFocusedCell();
-    if (focusedCell) {
-        const rowNode = focusedCell.rowNode;
-        const column = focusedCell.column;
-
-        const cellElement = this.gridApi.getCellRendererInstances({
-            rowNodes: [rowNode],
-            columns: [column],
-        })[0];
-
-        if (cellElement) {
-            const isItalic = cellElement.getGui().style.fontStyle === 'italic';
-            cellElement.getGui().style.fontStyle = isItalic ? 'normal' : 'italic';
-        }
+  toggleItalic() {
+    if (this.selectedCell) {
+      const cellElement = this.getCellElement(this.selectedCell);
+      const isItalic = cellElement.style.fontStyle === 'italic';
+      cellElement.style.fontStyle = isItalic ? 'normal' : 'italic';
     }
-}
+  }
 
-toggleUnderline() {
-    const focusedCell = this.gridApi.getFocusedCell();
-    if (focusedCell) {
-        const rowNode = focusedCell.rowNode;
-        const column = focusedCell.column;
-
-        const cellElement = this.gridApi.getCellRendererInstances({
-            rowNodes: [rowNode],
-            columns: [column],
-        })[0];
-
-        if (cellElement) {
-            const isUnderlined = cellElement.getGui().style.textDecoration === 'underline';
-            cellElement.getGui().style.textDecoration = isUnderlined ? 'none' : 'underline';
-        }
+  toggleUnderline() {
+    if (this.selectedCell) {
+      const cellElement = this.getCellElement(this.selectedCell);
+      const isUnderlined = cellElement.style.textDecoration === 'underline';
+      cellElement.style.textDecoration = isUnderlined ? 'none' : 'underline';
     }
+  }
+
+  private getCellElement(selectedCell: any): HTMLElement {
+    return document.querySelector(
+      `.ag-row[row-index="${selectedCell.rowIndex}"] .ag-cell[col-id="${selectedCell.column.colId}"]`
+    );
+  }
 }
