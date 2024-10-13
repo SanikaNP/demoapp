@@ -1,0 +1,32 @@
+// Method to toggle bold formatting
+public toggleBold() {
+    const selectedNodes = this.api.getSelectedNodes();
+    if (selectedNodes.length > 0) {
+        selectedNodes.forEach(node => {
+            node.setDataValue('name', `<span style="font-weight: bold;">${node.data.name}</span>`);
+        });
+        this.api.refreshCells();
+    }
+}
+
+// Method to toggle italic formatting
+public toggleItalic() {
+    const selectedNodes = this.api.getSelectedNodes();
+    if (selectedNodes.length > 0) {
+        selectedNodes.forEach(node => {
+            node.setDataValue('name', `<span style="font-style: italic;">${node.data.name}</span>`);
+        });
+        this.api.refreshCells();
+    }
+}
+
+// Method to toggle underline formatting
+public toggleUnderline() {
+    const selectedNodes = this.api.getSelectedNodes();
+    if (selectedNodes.length > 0) {
+        selectedNodes.forEach(node => {
+            node.setDataValue('name', `<span style="text-decoration: underline;">${node.data.name}</span>`);
+        });
+        this.api.refreshCells();
+    }
+}
