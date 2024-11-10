@@ -1,38 +1,431 @@
-toggleBold() {
-       const selectedCells = this.gridApi.getSelectedCells();
-       selectedCells.forEach(cell => {
-           const cellElement = this.gridApi.getCellRendererInstances({
-               rowNodes: [cell.rowNode],
-               columns: [cell.column]
-           })[0];
-           if (cellElement) {
-               cellElement.getGui().style.fontWeight = cellElement.getGui().style.fontWeight === 'bold' ? 'normal' : 'bold';
-           }
-       });
-   }
+.button-container {
+  display: flex;
+  gap: 10px;
+}
 
-   toggleItalic() {
-       const selectedCells = this.gridApi.getSelectedCells();
-       selectedCells.forEach(cell => {
-           const cellElement = this.gridApi.getCellRendererInstances({
-               rowNodes: [cell.rowNode],
-               columns: [cell.column]
-           })[0];
-           if (cellElement) {
-               cellElement.getGui().style.fontStyle = cellElement.getGui().style.fontStyle === 'italic' ? 'normal' : 'italic';
-           }
-       });
-   }
+.dropdown {
+  position: relative;
+}
 
-   toggleUnderline() {
-       const selectedCells = this.gridApi.getSelectedCells();
-       selectedCells.forEach(cell => {
-           const cellElement = this.gridApi.getCellRendererInstances({
-               rowNodes: [cell.rowNode],
-               columns: [cell.column]
-           })[0];
-           if (cellElement) {
-               cellElement.getGui().style.textDecoration = cellElement.getGui().style.textDecoration === 'underline' ? 'none' : 'underline';
-           }
-       });
-   }
+.dropdown-btn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-btn i {
+  margin-right: 5px;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-width: 150px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: none;
+}
+
+.dropdown-content.animated-dropdown {
+  display: block;
+  animation: fadeIn 0.3s ease-out, slideDown 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-10px); }
+  to { transform: translateY(0); }
+}
+
+.nested-dropdown {
+  position: relative;
+}
+
+.side-dropdown {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-width: 120px;
+  padding: 5px 0;
+  display: block;
+  animation: fadeIn 0.3s ease-out, slideDown 0.3s ease-out;
+}
+
+.nested-dropdown button {
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.nested-dropdown button:hover {
+  background-color: #e9ecef;
+}
+
+.tooltip {
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.dropdown-btn:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+
+
+
+
+<div class="container">
+  <button *ngIf="!showGrid" (click)="createSpreadsheet()" class="create-button">
+    Create Spreadsheet
+  </button>
+
+  <!-- Tabs: Only shown after spreadsheet is created -->
+  <div *ngIf="showTabs" class="tabs">
+    <button (click)="selectTab('home')" [class.active]="activeTab === 'home'">Home</button>
+    <button (click)="selectTab('format')" [class.active]="activeTab === 'format'">Format</button>
+    <button (click)="selectTab('save')" [class.active]="activeTab === 'save'">Save</button>
+  </div>
+
+  <!-- Buttons under 'Home' tab -->
+  <div *ngIf="showTabs && activeTab === 'home'" class="tab-content">
+    <div class="button-container">
+      <!-- Add Button with Nested Dropdown -->
+      <div class="dropdown" (mouseenter)="toggleDropdown('add', true)" (mouseleave)="toggleDropdown('add', false)">
+        <button class="dropdown-btn">
+          <i class="fas fa-plus-circle"></i> Add
+        </button>
+        <div *ngIf="showAddDropdown" class="dropdown-content animated-dropdown">
+          <div class="nested-dropdown" (mouseenter)="toggleDropdown('addRow', true)" (mouseleave)="toggleDropdown('addRow', false)">
+            <button>
+              <i class="fas fa-arrow-down"></i> Add Row <i class="fas fa-angle-right"></i>
+            </button>
+            <div *ngIf="showAddRowOptions" class="side-dropdown">
+              <button (click)="addRow('before'); closeAllDropdowns()">Before</button>
+              <button (click)="addRow('after'); closeAllDropdowns()">After</button>
+            </div>
+          </div>
+          <div class="nested-dropdown" (mouseenter)="toggleDropdown('addColumn', true)" (mouseleave)="toggleDropdown('addColumn', false)">
+            <button>
+              <i class="fas fa-arrow-right"></i> Add Column <i class="fas fa-angle-right"></i>
+            </button>
+            <div *ngIf="showAddColumnOptions" class="side-dropdown">
+              <button (click)="addColumn('before'); closeAllDropdowns()">Before</button>
+              <button (click)="addColumn('after'); closeAllDropdowns()">After</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Delete Button with Tooltip -->
+      <div class="dropdown" (mouseenter)="toggleDropdown('delete', true)" (mouseleave)="toggleDropdown('delete', false)">
+        <button class="dropdown-btn">
+          <i class="fas fa-minus-circle"></i> Delete
+          <span class="tooltip">Click to delete selected items</span>
+        </button>
+        <div *ngIf="showDeleteDropdown" class="dropdown-content animated-dropdown">
+          <button (click)="deleteRow()">Delete Selected Row(s)</button>
+          <button (click)="deleteColumn()">Delete Focused Column</button>
+        </div>
+      </div>
+    </div>
+    
+
+  </div>
+
+  <!-- Grid Container -->
+  <div class="grid-container">
+    <h2 *ngIf="spreadsheetName">Spreadsheet Name: {{ spreadsheetName }}</h2>
+    <ag-grid-angular
+      *ngIf="showGrid"
+      style="width: 100%; height: 400px;"
+      class="ag-theme-alpine"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      (gridReady)="onGridReady($event)"
+      [rowSelection]="'multiple'"
+        [enableRangeHandle]="true"
+        [suppressRowClickSelection]="true"
+        [enableFillHandle]="true"
+        [enableRangeSelection]="true"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+  </div>
+   <!-- Aggregation Component -->
+   <div *ngIf="showGrid && activeTab === 'home'" class="aggregation-container">
+    <app-aggregation [gridApi]="gridApi"></app-aggregation>
+  </div>
+
+</div>
+
+
+
+
+
+
+import { Component, ViewChild } from '@angular/core';
+import { ColDef, GridApi, ColumnApi, ModuleRegistry } from '@ag-grid-community/core';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { EditableHeaderComponent } from '../editable-header/editable-header.component';
+import { RangeSelectionModule } from '@ag-grid-enterprise/range-selection';
+import { AggregationComponent } from '../aggregation/aggregation.component';
+ModuleRegistry.registerModules([ClientSideRowModelModule]);
+ModuleRegistry.registerModules([ RangeSelectionModule ]);
+@Component({
+  selector: 'app-spreadsheet',
+  templateUrl: './spreadsheet.component.html',
+  styleUrls: ['./spreadsheet.component.css']
+})
+export class SpreadsheetComponent {
+  @ViewChild(AggregationComponent) aggregationComponent!: AggregationComponent;
+  public rowData: any[] = [];
+  public columnDefs: ColDef[] = [];
+  public gridApi!: GridApi;
+  public columnApi!: ColumnApi;
+  public spreadsheetName: string = '';
+  public showGrid: boolean = false;
+  public showTabs: boolean = false;
+  public activeTab: string = 'home';
+  private selectedColIndex: number | null = null; // To track the selected column index
+  public selectedColumnIndex: number | null = null;
+  public sumOfSelectedCells: number = 0;
+
+  
+
+  showAddDropdown = false;
+  showAddRowOptions = false;
+  showAddColumnOptions = false;
+  showDeleteDropdown = false;
+  
+  private closeTimeout: any;
+  
+  toggleDropdown(menu: string, open: boolean) {
+    // Clear any existing close timeout when toggling dropdowns
+    clearTimeout(this.closeTimeout);
+  
+    switch (menu) {
+      case 'add':
+        this.showAddDropdown = open;
+        if (!open) this.scheduleCloseAllDropdowns(); // Close nested dropdowns with delay when main menu closes
+        break;
+      case 'addRow':
+        this.showAddRowOptions = open;
+        if (!open) this.scheduleCloseAddRowOptions(); // Delay closing add row options
+        break;
+      case 'addColumn':
+        this.showAddColumnOptions = open;
+        if (!open) this.scheduleCloseAddColumnOptions(); // Delay closing add column options
+        break;
+      case 'delete':
+        this.showDeleteDropdown = open;
+        break;
+    }
+  }
+  
+  scheduleCloseAllDropdowns() {
+    this.closeTimeout = setTimeout(() => {
+      this.closeAllDropdowns();
+    }, 300); // Adjust delay to 300ms
+  }
+  
+  scheduleCloseAddRowOptions() {
+    this.closeTimeout = setTimeout(() => {
+      this.showAddRowOptions = false;
+    }, 300);
+  }
+  
+  scheduleCloseAddColumnOptions() {
+    this.closeTimeout = setTimeout(() => {
+      this.showAddColumnOptions = false;
+    }, 300);
+  }
+  
+  closeAllDropdowns() {
+    this.showAddDropdown = false;
+    this.showAddRowOptions = false;
+    this.showAddColumnOptions = false;
+    this.showDeleteDropdown = false;
+  }
+  
+
+  constructor() {
+    this.initializeGrid();
+    headerComponentFramework: EditableHeaderComponent
+  }
+
+  createSpreadsheet() {
+    const filename = prompt('Enter file name for new spreadsheet');
+    if (filename) {
+      this.spreadsheetName = filename;
+      this.showGrid = true;
+      this.showTabs = true;
+    } else {
+      alert('File name cannot be empty');
+    }
+  }
+
+  selectTab(tab: string) {
+    this.activeTab = tab;
+  }
+
+  private initializeGrid() {
+    this.columnDefs = [
+      { headerName: 'Select', checkboxSelection: true, width: 80 },
+      { headerName: 'Column 1', field: 'col1', editable: true, headerComponent: EditableHeaderComponent,},
+      { headerName: 'Column 2', field: 'col2', editable: true,headerComponent: EditableHeaderComponent, },
+      { headerName: 'Column 3', field: 'col3', editable: true,headerComponent: EditableHeaderComponent, },
+      { headerName: 'Column 4', field: 'col4', editable: true,headerComponent: EditableHeaderComponent, },
+    ];
+
+    this.rowData = Array.from({ length: 10 }, () => {
+      const row: any = {};
+      this.columnDefs.forEach(col => {
+          if (col.field) {
+              row[col.field] = ''; // Set each cell in the row as blank
+          }
+      });
+      return row;
+  });
+  }
+
+  onGridReady(params: { api: GridApi; columnApi: ColumnApi }) {
+    this.gridApi = params.api;
+    this.columnApi = params.columnApi;
+    this.gridApi.sizeColumnsToFit(); // This will size columns to fit the grid width initially.
+  
+    // Auto size all columns based on their content
+    this.gridApi.autoSizeAllColumns(); // Updated to call on gridApi instead
+
+  }
+  
+
+   // Method to handle column header clicks
+   onColumnHeaderClicked(event: any) {
+    this.selectedColumnIndex = event.column.getIndex();
+  }
+
+  focusOnCell(rowIndex: number, colKey: string) {
+    if (this.gridApi) {
+      this.gridApi.setFocusedCell(rowIndex, colKey);
+    }
+  }
+
+  // Cell click event handler to focus the cell clicked
+  onCellClicked(event: any) {
+    this.focusOnCell(event.rowIndex, event.colDef.field);
+  }
+
+   // Column click event to set the selected column index
+   onColumnClicked(event: any) {
+    this.selectedColIndex = this.columnDefs.findIndex(col => col.field === event.column.getColId());
+  }
+
+  addRow(position: 'before' | 'after') {
+    const selectedNodes = this.gridApi.getSelectedNodes();
+    if (selectedNodes.length === 0) {
+        alert('Please select a row to add a new row relative to it.');
+        return;
+    }
+
+    const selectedIndex = selectedNodes[0]?.rowIndex ?? -1;
+    if (selectedIndex >= 0) {
+        const newRow: any = {};
+        this.columnDefs.forEach((col) => {
+            if (col.field) newRow[col.field] = '';
+        });
+
+        const insertionIndex = position === 'before' ? selectedIndex : selectedIndex + 1;
+        this.rowData.splice(insertionIndex, 0, newRow);
+        this.gridApi.setRowData(this.rowData); // Refresh the grid with the new row data
+    } else {
+        alert('Could not determine selected row index.');
+    }
+}
+
+addColumn(position: 'before' | 'after') {
+    const focusedCell = this.gridApi.getFocusedCell();
+    if (!focusedCell) {
+      alert('Please focus on a column to add a new column.');
+      return;
+    }
+
+    const columnIndex = focusedCell.column.getColId();
+    const newColName = prompt('Enter new column name');
+    if (!newColName) {
+      alert('Column name cannot be empty');
+      return;
+    }
+
+    const index = this.columnDefs.findIndex(col => col.field === columnIndex);
+    const newColumn: ColDef = {
+      headerName: newColName,
+      field: newColName.toLowerCase().replace(/\s/g, ''),
+      editable: true,
+      headerComponent: EditableHeaderComponent
+    };
+
+    const insertionIndex = position === 'before' ? index : index + 1;
+    this.columnDefs.splice(insertionIndex, 0, newColumn);
+    this.gridApi.setColumnDefs(this.columnDefs);
+}
+
+deleteRow() {
+    const selectedRows = this.gridApi.getSelectedRows();
+    if (selectedRows.length === 0) {
+      alert('Please select rows to delete');
+      return;
+    }
+    this.rowData = this.rowData.filter(row => !selectedRows.includes(row));
+    this.gridApi.setRowData(this.rowData); // Update the grid with new row data
+}
+
+deleteColumn() {
+    const focusedCell = this.gridApi.getFocusedCell();
+    if (!focusedCell) {
+      alert('Please focus on a column to delete it.');
+      return;
+    }
+
+    const columnIndex = focusedCell.column.getColId();
+    const index = this.columnDefs.findIndex(col => col.field === columnIndex);
+
+    if (index > -1) {
+      this.columnDefs.splice(index, 1);
+      this.gridApi.setColumnDefs(this.columnDefs);
+    } else {
+      alert('Unable to delete column.');
+    }
+}
+
+}
