@@ -1,3 +1,83 @@
+<div>
+        <button (click)="calculateAggregations()">Calculate Aggregations</button>
+      
+        <div *ngIf="aggregationResults">
+          <p>Sum: {{ aggregationResults.sum }}</p>
+          <p>Average: {{ aggregationResults.average }}</p>
+          <p>Min: {{ aggregationResults.min }}</p>
+          <p>Max: {{ aggregationResults.max }}</p>
+          <p>Count: {{ aggregationResults.count }}</p>
+        </div>
+      </div>
+
+
+import { Component, Input } from '@angular/core';
+import { GridApi, CellRange } from '@ag-grid-community/core';
+import { ComponentFixture } from '@angular/core/testing';
+
+@Component({
+  selector: 'app-aggregation',
+  templateUrl: './aggregation.component.html',
+  styleUrls: ['./aggregation.component.css']
+})
+export class AggregationComponent {
+  @Input() gridApi!: GridApi; // Input property to receive the gridApi from parent component
+  
+  aggregationResults = {
+    sum: 0,
+    average: 0,
+    min: 0,
+    max: 0,
+    count: 0
+  };
+
+  // Function to calculate all aggregations at once
+  calculateAggregations() {
+    const selectedRanges = this.gridApi.getCellRanges();
+    let sum = 0, min = Number.POSITIVE_INFINITY, max = Number.NEGATIVE_INFINITY, count = 0;
+
+    if (selectedRanges && selectedRanges.length > 0) {
+      selectedRanges.forEach(range => {
+        if (range.startRow && range.endRow) {
+          const startRow = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
+          const endRow = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
+          const colIds = range.columns.map(col => col.getColId());
+
+          for (let rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
+            const rowNode = this.gridApi.getDisplayedRowAtIndex(rowIndex);
+            if (rowNode) {
+              colIds.forEach(colId => {
+                const cellValue = rowNode.data[colId];
+                if (!isNaN(cellValue)) {
+                  const numValue = Number(cellValue);
+                  sum += numValue;
+                  min = Math.min(min, numValue);
+                  max = Math.max(max, numValue);
+                  count++;
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+
+    this.aggregationResults.sum = sum;
+    this.aggregationResults.count = count;
+    this.aggregationResults.average = count > 0 ? sum / count : 0;
+    this.aggregationResults.min = isFinite(min) ? min : 0;
+    this.aggregationResults.max = isFinite(max) ? max : 0;
+  }
+}
+
+
+
+
+
+
+
+
+
 .button-container {
   display: flex;
   gap: 10px;
